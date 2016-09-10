@@ -47,8 +47,9 @@ Module.register("MMM-Fuel", {
 
         var wrapper = document.createElement("div");
         var header = document.createElement("header");
+        header.classList.add("align-left");
         var logo = document.createElement("i");
-        logo.classList.add("fa", "fa-car");
+        logo.classList.add("fa", "fa-car", "logo");
         header.appendChild(logo);
         var name = document.createElement("span");
         name.innerHTML = this.translate("FUEL_PRICES");
@@ -62,7 +63,7 @@ Module.register("MMM-Fuel", {
             wrapper.appendChild(text);
         } else {
             var table = document.createElement("table");
-            table.classList.add("small", "table");
+            table.classList.add("small", "table", "align-left");
 
             table.appendChild(this.createLabelRow());
 
@@ -131,6 +132,7 @@ Module.register("MMM-Fuel", {
         var address = document.createElement("td");
         address.classList.add("xsmall");
         address.innerHTML = data.postCode + " " + data.place + " - " + data.street + " " + data.houseNumber;
+        details.appendChild(address);
 
         appendTo.appendChild(details);
     }
