@@ -40,9 +40,9 @@ module.exports = NodeHelper.create({
             if (response.statusCode === 200) {
                 body = JSON.parse(body);
                 if(body.ok) {
-                    var price = body.stations;
+                    var price = body.stations.slice(0);
                     price.sort((a, b) => {
-                        return a.dist - b.dist;
+                        return a.price - b.price;
                     });
                     this.sendSocketNotification("PRICELIST", {byPrice: price, byDistance: body.stations});
                 } else {
