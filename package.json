@@ -1,0 +1,23 @@
+{
+  "name": "mmm-fuel",
+  "version": "1.0.0",
+  "description": "Gas Station price Module for MagicMirror<sup>2</sup>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fewieden/MMM-Fuel.git"
+  },
+  "keywords": [
+    "MagicMirror",
+    "Fuel price",
+    "Gas Station"
+  ],
+  "author": "fewieden",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fewieden/MMM-Fuel/issues"
+  },
+  "homepage": "https://github.com/fewieden/MMM-Fuel#readme",
+  "dependencies": {
+    "request": "^2.74.0"
+  }
+}
