@@ -11,7 +11,7 @@ Gas Station price Module for MagicMirror<sup>2</sup>
   * [request](https://www.npmjs.com/package/request)
   
 ## Info
-The data used in this module comes from [tankerkoenig.de](www.tankerkoenig.de) and is only for Gas Stations in Germany.
+The data used in this module comes from [tankerkoenig.de](http://www.tankerkoenig.de) and is only for Gas Stations in Germany.
 If you find an API for other countries let me know and i will implement them as well.
 
 ## Installation
