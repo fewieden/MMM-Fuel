@@ -1,7 +1,7 @@
 {
   "name": "mmm-fuel",
   "version": "1.0.0",
-  "description": "Gas Station price Module for MagicMirror<sup>2</sup>",
+  "description": "Gas Station price Module for MagicMirror2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fewieden/MMM-Fuel.git"
