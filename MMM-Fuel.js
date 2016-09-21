@@ -131,7 +131,7 @@ Module.register("MMM-Fuel", {
 
         var address = document.createElement("td");
         address.classList.add("xsmall");
-        address.innerHTML = data.postCode + " " + data.place + " - " + data.street + " " + data.houseNumber;
+        address.innerHTML = ("0" + data.postCode).slice(-5) + " " + data.place + " - " + data.street + " " + data.houseNumber;
         details.appendChild(address);
 
         appendTo.appendChild(details);
