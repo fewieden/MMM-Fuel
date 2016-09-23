@@ -14,6 +14,9 @@ Gas Station price Module for MagicMirror<sup>2</sup>
 The data used in this module comes from [tankerkoenig.de](http://www.tankerkoenig.de) and is only for Gas Stations in Germany.
 If you find an API for other countries let me know and i will implement them as well.
 
+Read the [Terms of Use](https://creativecommons.tankerkoenig.de/#usage) carefully, especially the restrictions for smart mirrors,
+or your API access will be suspended.
+
 ## Installation
  1. Clone this repo into `~/MagicMirror/modules` directory.
  2. Configure your `~/MagicMirror/config/config.js`:
@@ -43,4 +46,4 @@ If you find an API for other countries let me know and i will implement them as 
 | `radius` | `5` | Lookup Area for Gas Stations in km. Possible values 1-25. |
 | `max` | `5` | How many gas stations should be displayed. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
-| `updateInterval` | `600000` (10 mins) | How often should the data be fetched. |
+| `updateInterval` | `900000` (15 mins) | How often should the data be fetched. |

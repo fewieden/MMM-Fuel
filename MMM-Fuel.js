@@ -13,7 +13,7 @@ Module.register("MMM-Fuel", {
         radius: 5,
         max: 5,
         rotateInterval: 60 * 1000,           // every minute
-        updateInterval: 10 * 60 * 1000       // every 10 minutes
+        updateInterval: 15 * 60 * 1000       // every 15 minutes
     },
 
     getTranslations: function () {
