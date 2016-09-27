@@ -2,5 +2,9 @@
   "LOADING": "Lade...",
   "FUEL_PRICES": "Spritpreise",
   "CHEAPEST_STATIONS": "Günstigste Tankstellen",
-  "CLOSEST_STATIONS": "Nächste Tankstellen"
+  "CLOSEST_STATIONS": "Nächste Tankstellen",
+  "COMMAND_LIST": "Liste aller Sprachbefehle",
+  "MODE": "Modus",
+  "VOICE_COMMANDS": "Sprachbefehle",
+  "API_KEY_NEEDED": "Du benötigst einen API Zugang, um die Tankstellen auf einer Karte darzustellen."
 }

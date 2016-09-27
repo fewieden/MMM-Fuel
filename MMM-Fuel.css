@@ -5,3 +5,19 @@
 .MMM-Fuel .centered {
     text-align: center;
 }
+
+.MMM-Fuel-blur {
+    -webkit-filter: blur(2px) brightness(50%);
+}
+
+.MMM-Fuel .modal {
+    position: fixed;
+    text-align: left;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+}
+
+.MMM-Fuel .modal ul {
+    margin: 0px;
+}
