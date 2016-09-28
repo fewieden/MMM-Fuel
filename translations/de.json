@@ -6,5 +6,6 @@
   "COMMAND_LIST": "Liste aller Sprachbefehle",
   "MODE": "Modus",
   "VOICE_COMMANDS": "Sprachbefehle",
-  "API_KEY_NEEDED": "Du benötigst einen API Zugang, um die Tankstellen auf einer Karte darzustellen."
+  "API_KEY_NEEDED": "Du benötigst einen API Zugang, um die Tankstellen auf einer Karte darzustellen.",
+  "MAP_API_NOT_READY": "Die Karten API ist noch nicht verfügbar. Versuche es später noch einmal."
 }

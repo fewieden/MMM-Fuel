@@ -11,13 +11,16 @@ Module.register("MMM-Fuel", {
     help: false,
     map: false,
     mapUI: null,
+    interval: null,
 
     defaults: {
         radius: 5,
         max: 5,
-        modal: 10,
         map_api_key: false,
         zoom: 12,
+        width: 600,
+        height: 600,
+        colored: false,
         rotateInterval: 60 * 1000,           // every minute
         updateInterval: 15 * 60 * 1000       // every 15 minutes
     },
@@ -27,8 +30,8 @@ Module.register("MMM-Fuel", {
         sentences: [
             "OPEN HELP",
             "CLOSE HELP",
-            "SHOW GAS STATIONS MAP",
-            "HIDE GAS STATIONS MAP"
+            "SHOW GAS STATIONS",
+            "HIDE MAP"
         ]
     },
 
@@ -43,17 +46,21 @@ Module.register("MMM-Fuel", {
         return ["font-awesome.css", "MMM-Fuel.css"];
     },
 
-    getScripts: function() {
-        return this.config.map_api_key ? ["https://maps.googleapis.com/maps/api/js?key=" + this.config.map_api_key] : [];
-    },
-
     start: function () {
         Log.info("Starting module: " + this.name);
-        setInterval(() => {
+        //Add script manually, getScripts doesn't work for it!
+        var script = document.createElement("script");
+        script.src = "https://maps.googleapis.com/maps/api/js?key=" + this.config.map_api_key;
+        document.querySelector("body").appendChild(script);
+        this.interval = this.createInterval();
+        this.sendSocketNotification("CONFIG", this.config);
+    },
+
+    createInterval: function(){
+        return setInterval(() => {
             this.sortByPrice = !this.sortByPrice;
             this.updateDom(300);
         }, this.config.rotateInterval);
-        this.sendSocketNotification("CONFIG", this.config);
     },
 
     notificationReceived: function (notification, payload, sender) {
@@ -71,7 +78,6 @@ Module.register("MMM-Fuel", {
     socketNotificationReceived: function (notification, payload) {
         if (notification === "PRICELIST") {
             this.priceList = payload;
-            this.createMapUI();
             this.updateDom(300);
         }
     },
@@ -124,8 +130,29 @@ Module.register("MMM-Fuel", {
                 list.classList.add("MMM-Fuel-blur");
                 var modal = document.createElement("div");
                 modal.classList.add("modal");
-                if(this.map){
-                    modal.appendChild(this.mapUI);
+                if(this.map && this.config.map_api_key) {
+                    if (typeof google === 'object' && typeof google.maps === 'object') {
+                        if (!this.config.colored) {
+                            modal.classList.add("no-color");
+                        }
+                        var map = document.createElement("div");
+                        map.style.height = this.config.height + "px";
+                        map.style.width = this.config.width + "px";
+                        modal.appendChild(map);
+                        var script = document.createElement("script");
+                        script.innerHTML = "var MMM_Fuel_map = new google.maps.Map(document.querySelector('div.map'), {center: new google.maps.LatLng(" + parseFloat(this.config.lat) + ", " + parseFloat(this.config.lng) + "), zoom: " + this.config.zoom + ", disableDefaultUI:true});" +
+                            "var trafficLayer = new google.maps.TrafficLayer();" +
+                            "trafficLayer.setMap(MMM_Fuel_map);" +
+                            "var MMM_Fuel_array = " + JSON.stringify(this.priceList.byPrice) + ";" +
+                            "for(var i = 0; i < MMM_Fuel_array.length; i++){" +
+                            "var marker = new google.maps.Marker({ position: {lat: MMM_Fuel_array[i].lat, lng: MMM_Fuel_array[i].lng}, label: i + 1 + '', map: MMM_Fuel_map});" +
+                            "}";
+                        modal.appendChild(script);
+                    } else {
+                        modal.innerHTML = this.translate("MAP_API_NOT_READY");
+                    }
+                } else if(this.map){
+                    modal.innerHTML = this.translate("API_KEY_NEEDED");
                 } else {
                     this.appendHelp(modal);
                 }
@@ -201,16 +228,18 @@ Module.register("MMM-Fuel", {
             if(/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)){
                 this.map = false;
                 this.help = true;
+                clearInterval(this.interval);
             } else if(/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)){
                 this.help = false;
+                this.interval = this.createInterval();
             }
-        } else if(/(MAP)/g.test(data)){
-            if(/(SHOW)/g.test(data) || !this.map && !/(HIDE)/g.test(data)){
-                this.help = false;
-                this.map = true;
-            } else if(/(HIDE)/g.test(data) || this.map && !/(SHOW)/g.test(data)){
-                this.map = false;
-            }
+        } else if(/(GAS)/g.test(data) && /(STATIONS)/g.test(data)){
+            this.help = false;
+            this.map = true;
+            clearInterval(this.interval);
+        } else if(/(HIDE)/g.test(data) && /(MAP)/g.test(data)){
+            this.map = false;
+            this.interval = this.createInterval();
         }
         this.updateDom(300);
     },
@@ -236,28 +265,5 @@ Module.register("MMM-Fuel", {
             list.appendChild(item);
         }
         appendTo.appendChild(list);
-    },
-
-    createMapUI: function(){
-        this.mapUI = document.createElement("div");
-        if(this.config.map_api_key){
-            var map = new google.maps.Map(this.mapUI, {
-                center: {lat: this.config.lat, lng: this.config.lng},
-                zoom: this.config.zoom
-            });
-
-            var trafficLayer = new google.maps.TrafficLayer();
-            trafficLayer.setMap(map);
-
-            for(var i = 0; i < this.priceList.byPrice.length; i++){
-                var marker = new google.maps.Marker({
-                    position: {lat: this.priceList.byPrice[i].lat, lng: this.priceList.byPrice[i].lng},
-                    label: i + 1,
-                    map: map
-                });
-            }
-        } else {
-            this.mapUI.innerHTML = this.translate("API_KEY_NEEDED");
-        }
     }
 });

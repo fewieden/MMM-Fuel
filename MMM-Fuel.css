@@ -12,6 +12,7 @@
 
 .MMM-Fuel .modal {
     position: fixed;
+    z-index: 9000;
     text-align: left;
     left: 50%;
     top: 50%;
@@ -20,4 +21,8 @@
 
 .MMM-Fuel .modal ul {
     margin: 0px;
+}
+
+.MMM-Fuel .no-color{
+    -webkit-filter: grayscale(100%);
 }
