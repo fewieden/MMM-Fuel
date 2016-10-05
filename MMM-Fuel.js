@@ -136,11 +136,12 @@ Module.register("MMM-Fuel", {
                             modal.classList.add("no-color");
                         }
                         var map = document.createElement("div");
+                        map.classList.add("MMM-Fuel-map");
                         map.style.height = this.config.height + "px";
                         map.style.width = this.config.width + "px";
                         modal.appendChild(map);
                         var script = document.createElement("script");
-                        script.innerHTML = "var MMM_Fuel_map = new google.maps.Map(document.querySelector('div.map'), {center: new google.maps.LatLng(" + parseFloat(this.config.lat) + ", " + parseFloat(this.config.lng) + "), zoom: " + this.config.zoom + ", disableDefaultUI:true});" +
+                        script.innerHTML = "var MMM_Fuel_map = new google.maps.Map(document.querySelector('div.MMM-Fuel-map'), {center: new google.maps.LatLng(" + parseFloat(this.config.lat) + ", " + parseFloat(this.config.lng) + "), zoom: " + this.config.zoom + ", disableDefaultUI:true});" +
                             "var trafficLayer = new google.maps.TrafficLayer();" +
                             "trafficLayer.setMap(MMM_Fuel_map);" +
                             "var MMM_Fuel_array = " + JSON.stringify(this.priceList.byPrice) + ";" +
