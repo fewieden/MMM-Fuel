@@ -226,21 +226,21 @@ Module.register("MMM-Fuel", {
 
     checkCommands: function(data){
         if(/(HELP)/g.test(data)){
-            if(/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)){
+            if(/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)){
+                this.help = false;
+                this.interval = this.createInterval();
+            } else if(/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)){
                 this.map = false;
                 this.help = true;
                 clearInterval(this.interval);
-            } else if(/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)){
-                this.help = false;
-                this.interval = this.createInterval();
             }
+        } else if(/(HIDE)/g.test(data) && /(MAP)/g.test(data)){
+            this.map = false;
+            this.interval = this.createInterval();
         } else if(/(GAS)/g.test(data) && /(STATIONS)/g.test(data)){
             this.help = false;
             this.map = true;
             clearInterval(this.interval);
-        } else if(/(HIDE)/g.test(data) && /(MAP)/g.test(data)){
-            this.map = false;
-            this.interval = this.createInterval();
         }
         this.updateDom(300);
     },
