@@ -7,6 +7,7 @@ Gas Station price Module for MagicMirror<sup>2</sup>
 
 ## Dependencies
   * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
+  * OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice)
   * npm
   * [request](https://www.npmjs.com/package/request)
   
@@ -47,3 +48,15 @@ or your API access will be suspended.
 | `max` | `5` | How many gas stations should be displayed. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
 | `updateInterval` | `900000` (15 mins) | How often should the data be fetched. |
+
+## OPTIONAL: Voice Control
+This module supports voice control by [MMM-voice](https://github.com/fewieden/MMM-voice). In order to use this feature, it's required to install the voice module. There are no extra config options for voice control needed.
+
+### Mode
+The voice control mode for this module is `FUEL`
+
+### List of all Voice Commands
+  * OPEN HELP -> Shows the information from the readme here with mode and all commands.
+  * CLOSE HELP -> Hides the help information.
+  * SHOW GAS STATIONS MAP -> Shows a map with the gas stations labeled by Price starting with 1.
+  * HIDE GAS STATIONS MAP -> Hide the map.

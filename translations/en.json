@@ -2,5 +2,10 @@
   "LOADING": "Loading...",
   "FUEL_PRICES": "Fuel Prices",
   "CHEAPEST_STATIONS": "Cheapest Gas Stations",
-  "CLOSEST_STATIONS": "Closest Gas Stations"
+  "CLOSEST_STATIONS": "Closest Gas Stations",
+  "COMMAND_LIST": "List of all Voice Commands",
+  "MODE": "Mode",
+  "VOICE_COMMANDS": "Voice Commands",
+  "API_KEY_NEEDED": "You need to add an API key, in order to view the gas stations on a map.",
+  "MAP_API_NOT_READY": "The map API is not ready yet. Try again later."
 }
