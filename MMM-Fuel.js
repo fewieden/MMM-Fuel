@@ -49,9 +49,11 @@ Module.register("MMM-Fuel", {
     start: function () {
         Log.info("Starting module: " + this.name);
         //Add script manually, getScripts doesn't work for it!
-        var script = document.createElement("script");
-        script.src = "https://maps.googleapis.com/maps/api/js?key=" + this.config.map_api_key;
-        document.querySelector("body").appendChild(script);
+        if(this.config.map_api_key){
+            var script = document.createElement("script");
+            script.src = "https://maps.googleapis.com/maps/api/js?key=" + this.config.map_api_key;
+            document.querySelector("body").appendChild(script);
+        }
         this.interval = this.createInterval();
         this.sendSocketNotification("CONFIG", this.config);
     },
