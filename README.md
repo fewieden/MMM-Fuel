@@ -30,7 +30,7 @@ or your API access will be suspended.
             api_key: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
             lat: 52.518611,
             lng: 13.408333,
-            type: ["diesel"],
+            types: ["diesel"],
             ...
         }
     }
