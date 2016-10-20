@@ -1,5 +1,14 @@
+.MMM-Fuel .table {
+    border-spacing: 10px 0px;
+    border-collapse: separate;
+}
+
 .MMM-Fuel .logo {
     margin-right: 5px;
+}
+
+.MMM-Fuel .sortBy {
+    margin-left: 5px;
 }
 
 .MMM-Fuel .centered {

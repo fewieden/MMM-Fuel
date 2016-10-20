@@ -192,7 +192,7 @@ Module.register("MMM-Fuel", {
 
             if(this.sortByPrice && this.config.sortBy === this.config.types[i]){
                 var sortIcon = document.createElement("i");
-                sortIcon.classList.add("fa", "fa-long-arrow-down");
+                sortIcon.classList.add("fa", "fa-long-arrow-down", "sortBy");
                 typeLabel.appendChild(sortIcon);
             }
 
@@ -208,8 +208,8 @@ Module.register("MMM-Fuel", {
 
         if(!this.sortByPrice){
             var sortIcon = document.createElement("i");
-            sortIcon.classList.add("fa", "fa-long-arrow-down");
-            typeLabel.appendChild(sortIcon);
+            sortIcon.classList.add("fa", "fa-long-arrow-down", "sortBy");
+            distanceIconLabel.appendChild(sortIcon);
         }
 
         labelRow.appendChild(distanceIconLabel);
