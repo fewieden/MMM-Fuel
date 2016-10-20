@@ -30,7 +30,7 @@ or your API access will be suspended.
             api_key: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
             lat: 52.518611,
             lng: 13.408333,
-            type: "diesel",
+            type: ["diesel"],
             ...
         }
     }
@@ -43,10 +43,11 @@ or your API access will be suspended.
 | `api_key` | REQUIRED | Get an API key for free access to the data of www.tankerkoenig.de [here](https://creativecommons.tankerkoenig.de/#register). |
 | `lat` | REQUIRED | Decimal degrees latitude. |
 | `lng` | REQUIRED | Decimal degrees longitude. |
-| `type` | REQUIRED | Fuel type `'diesel'`, `'e5'` or `'e10'`. |
+| `types` | `["diesel"]` | Fuel types in an array e.g. `["diesel", "e5"]` valid options: `"diesel"`, `"e5"` and `"e10"`. |
+| `sortBy` | `"diesel"` | Price sorting by which fuel type `"diesel"`, `"e5"` or `"e10"`. |
 | `radius` | `5` | Lookup Area for Gas Stations in km. Possible values 1-25. |
 | `max` | `5` | How many gas stations should be displayed. |
-| `map_api_key` | false | Required to show the gas stations map with traffic layer. You can get it [here](https://console.developers.google.com/) and don't forget to activate maps api for javascript. |
+| `map_api_key` | `false` | Required to show the gas stations map with traffic layer. You can get it [here](https://console.developers.google.com/) and don't forget to activate maps api for javascript. |
 | `zoom` | `12` | Zoom of the map. (Min 0, Max 18 depends on the area) |
 | `height` | `600` | Height of the map in pixel. |
 | `width` | `600` | Width of the map in pixel. |

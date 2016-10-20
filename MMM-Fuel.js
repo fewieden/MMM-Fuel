@@ -21,6 +21,9 @@ Module.register("MMM-Fuel", {
         width: 600,
         height: 600,
         colored: false,
+        open: false,
+        types: ["diesel"],
+        sortBy: "diesel",
         rotateInterval: 60 * 1000,           // every minute
         updateInterval: 15 * 60 * 1000       // every 15 minutes
     },
@@ -179,19 +182,46 @@ Module.register("MMM-Fuel", {
         }
         labelRow.appendChild(sortLabel);
 
-        var priceIconLabel = document.createElement("th");
-        priceIconLabel.classList.add("centered");
-        var priceIcon = document.createElement("i");
-        priceIcon.classList.add("fa", "fa-money");
-        priceIconLabel.appendChild(priceIcon);
-        labelRow.appendChild(priceIconLabel);
+        for(var i = 0; i < this.config.types.length; i++) {
+            var typeLabel = document.createElement("th");
+            typeLabel.classList.add("centered");
+
+            var typeSpan = document.createElement("span");
+            typeSpan.innerHTML = this.config.types[i].charAt(0).toUpperCase() + this.config.types[i].slice(1);
+            typeLabel.appendChild(typeSpan);
+
+            if(this.sortByPrice && this.config.sortBy === this.config.types[i]){
+                var sortIcon = document.createElement("i");
+                sortIcon.classList.add("fa", "fa-long-arrow-down");
+                typeLabel.appendChild(sortIcon);
+            }
+
+            labelRow.appendChild(typeLabel);
+        }
 
         var distanceIconLabel = document.createElement("th");
         distanceIconLabel.classList.add("centered");
+
         var distanceIcon = document.createElement("i");
         distanceIcon.classList.add("fa", "fa-map-o");
         distanceIconLabel.appendChild(distanceIcon);
+
+        if(!this.sortByPrice){
+            var sortIcon = document.createElement("i");
+            sortIcon.classList.add("fa", "fa-long-arrow-down");
+            typeLabel.appendChild(sortIcon);
+        }
+
         labelRow.appendChild(distanceIconLabel);
+
+        if (this.config.open){
+            var openCloseIconLabel = document.createElement("th");
+            openCloseIconLabel.classList.add("centered");
+            var openCloseIcon = document.createElement("i");
+            openCloseIcon.classList.add("fa", "fa-clock-o");
+            openCloseIconLabel.appendChild(openCloseIcon);
+            labelRow.appendChild(openCloseIconLabel);
+        }
 
         return labelRow;
     },
@@ -203,20 +233,35 @@ Module.register("MMM-Fuel", {
         name.innerHTML = data.name;
         row.appendChild(name);
 
-        var price = document.createElement("td");
-        price.classList.add("centered");
-        price.innerHTML = data.price + " €";
-        row.appendChild(price);
+        for(var i = 0; i < this.config.types.length; i++) {
+            var price = document.createElement("td");
+            price.classList.add("centered");
+            price.innerHTML = data[this.config.types[i]] + " €";
+            row.appendChild(price);
+        }
 
         var distance = document.createElement("td");
         distance.classList.add("centered");
         distance.innerHTML = data.dist + " km";
         row.appendChild(distance);
 
+        if (this.config.open){
+            var lockUnlockIconLabel = document.createElement("td");
+            lockUnlockIconLabel.classList.add("centered");
+            var lockUnlockIcon = document.createElement("i");
+            if (data.isOpen) {
+                lockUnlockIcon.classList.add("fa", "fa-unlock");
+            } else {
+                lockUnlockIcon.classList.add("fa", "fa-lock");
+            }
+            lockUnlockIconLabel.appendChild(lockUnlockIcon);
+            row.appendChild(lockUnlockIconLabel);
+        }
+
         appendTo.appendChild(row);
 
         var details = document.createElement("tr");
-        details.setAttribute("colspan", 3);
+        details.setAttribute("colspan", 2 + this.config.types.length + (this.config.open ? 1 : 0));
 
         var address = document.createElement("td");
         address.classList.add("xsmall");

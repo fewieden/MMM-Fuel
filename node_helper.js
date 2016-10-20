@@ -32,7 +32,7 @@ module.exports = NodeHelper.create({
                 "lat=" + this.config.lat +
                 "&lng=" + this.config.lng +
                 "&rad=" + this.config.radius +
-                "&type=" + this.config.type +
+                "&type=all" +
                 "&apikey=" + this.config.api_key +
                 "&sort=dist"
         };
@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
                 if(body.ok) {
                     var price = body.stations.slice(0);
                     price.sort((a, b) => {
-                        return a.price - b.price;
+                        return a[this.config.sortBy] - b[this.config.sortBy];
                     });
                     this.sendSocketNotification("PRICELIST", {byPrice: price, byDistance: body.stations});
                 } else {
