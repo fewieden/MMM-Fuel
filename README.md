@@ -45,6 +45,7 @@ or your API access will be suspended.
 | `lng` | REQUIRED | Decimal degrees longitude. |
 | `types` | `["diesel"]` | Fuel types in an array e.g. `["diesel", "e5"]` valid options: `"diesel"`, `"e5"` and `"e10"`. |
 | `sortBy` | `"diesel"` | Price sorting by which fuel type `"diesel"`, `"e5"` or `"e10"`. |
+| `open` | `false` | Display whether the gas station is open or not. |
 | `radius` | `5` | Lookup Area for Gas Stations in km. Possible values 1-25. |
 | `max` | `5` | How many gas stations should be displayed. |
 | `map_api_key` | `false` | Required to show the gas stations map with traffic layer. You can get it [here](https://console.developers.google.com/) and don't forget to activate maps api for javascript. |
