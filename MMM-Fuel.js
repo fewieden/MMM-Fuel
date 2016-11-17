@@ -22,6 +22,7 @@ Module.register("MMM-Fuel", {
         height: 600,
         colored: false,
         open: false,
+        rotate: true,
         types: ["diesel"],
         sortBy: "diesel",
         rotateInterval: 60 * 1000,           // every minute
@@ -62,10 +63,14 @@ Module.register("MMM-Fuel", {
     },
 
     createInterval: function(){
-        return setInterval(() => {
-            this.sortByPrice = !this.sortByPrice;
-            this.updateDom(300);
-        }, this.config.rotateInterval);
+        if(!this.config.rotate){
+            return null;
+        } else {
+            return setInterval(() => {
+                this.sortByPrice = !this.sortByPrice;
+                this.updateDom(300);
+            }, this.config.rotateInterval);
+        }
     },
 
     notificationReceived: function (notification, payload, sender) {
