@@ -40,9 +40,27 @@ module.exports = NodeHelper.create({
             if (response.statusCode === 200) {
                 body = JSON.parse(body);
                 if(body.ok) {
+                    for(var i = body.stations.length - 1; i >= 0; i--){
+                        var zeroFlag = true;
+                        for(var n = 0; n < this.config.types.length; n++){
+                            if(body.stations[i][this.config.types[n]] > 0){
+                                zeroFlag = false;
+                                break;
+                            }
+                        }
+                        if(zeroFlag){
+                            body.stations.splice(i, 1);
+                        }
+                    }
                     var price = body.stations.slice(0);
                     price.sort((a, b) => {
-                        return a[this.config.sortBy] - b[this.config.sortBy];
+                        if(b[this.config.sortBy] == 0){
+                            return Number.MIN_SAFE_INTEGER;
+                        } else if(a[this.config.sortBy] == 0){
+                            return Number.MAX_SAFE_INTEGER;
+                        } else {
+                            return a[this.config.sortBy] - b[this.config.sortBy];
+                        }
                     });
                     this.sendSocketNotification("PRICELIST", {byPrice: price, byDistance: body.stations});
                 } else {
