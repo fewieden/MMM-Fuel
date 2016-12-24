@@ -41,14 +41,14 @@ module.exports = NodeHelper.create({
                 body = JSON.parse(body);
                 if(body.ok) {
                     for(var i = body.stations.length - 1; i >= 0; i--){
-                        var zeroFlag = true;
+                        var removeFlag = false;
                         for(var n = 0; n < this.config.types.length; n++){
-                            if(body.stations[i][this.config.types[n]] > 0){
-                                zeroFlag = false;
+                            if(body.stations[i][this.config.types[n]] <= 0 || (this.config.showOpenOnly && !body.stations[i].isOpen)){
+                                removeFlag = true;
                                 break;
                             }
                         }
-                        if(zeroFlag){
+                        if(removeFlag){
                             body.stations.splice(i, 1);
                         }
                     }

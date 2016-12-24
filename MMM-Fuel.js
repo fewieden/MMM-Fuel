@@ -22,6 +22,10 @@ Module.register("MMM-Fuel", {
         height: 600,
         colored: false,
         open: false,
+        shortenText: false,
+        showAddress: true,
+        showOpenOnly: true,
+        iconHeader: true,
         rotate: true,
         types: ["diesel"],
         sortBy: "diesel",
@@ -98,9 +102,11 @@ Module.register("MMM-Fuel", {
         var list = document.createElement("div");
         var header = document.createElement("header");
         header.classList.add("align-left");
-        var logo = document.createElement("i");
-        logo.classList.add("fa", "fa-car", "logo");
-        header.appendChild(logo);
+        if(this.config.iconHeader){
+            var logo = document.createElement("i");
+            logo.classList.add("fa", "fa-car", "logo");
+            header.appendChild(logo);
+        }
         var name = document.createElement("span");
         name.innerHTML = this.translate("FUEL_PRICES");
         header.appendChild(name);
@@ -235,7 +241,7 @@ Module.register("MMM-Fuel", {
         var row = document.createElement("tr");
 
         var name = document.createElement("td");
-        name.innerHTML = data.name;
+        name.innerHTML = this.config.shortenText ? data.name.slice(0, this.config.shortenText) + "&#8230;" : data.name;
         row.appendChild(name);
 
         for(var i = 0; i < this.config.types.length; i++) {
@@ -265,15 +271,18 @@ Module.register("MMM-Fuel", {
 
         appendTo.appendChild(row);
 
-        var details = document.createElement("tr");
-        details.setAttribute("colspan", 2 + this.config.types.length + (this.config.open ? 1 : 0));
+        if(this.config.showAddress){
+            var details = document.createElement("tr");
+            details.setAttribute("colspan", 2 + this.config.types.length + (this.config.open ? 1 : 0));
 
-        var address = document.createElement("td");
-        address.classList.add("xsmall");
-        address.innerHTML = ("0" + data.postCode).slice(-5) + " " + data.place + " - " + data.street + " " + data.houseNumber;
-        details.appendChild(address);
+            var address_string = ("0" + data.postCode).slice(-5) + " " + data.place + " - " + data.street + " " + data.houseNumber;
+            var address = document.createElement("td");
+            address.classList.add("xsmall");
+            address.innerHTML = this.config.shortenText ? address_string.slice(0, this.config.shortenText) + "&#8230;" : address_string;
+            details.appendChild(address);
 
-        appendTo.appendChild(details);
+            appendTo.appendChild(details);
+        }
     },
 
     checkCommands: function(data){
