@@ -53,6 +53,10 @@ or your API access will be suspended.
 | `height` | `600` | Height of the map in pixel. |
 | `width` | `600` | Width of the map in pixel. |
 | `colored` | `false` | Boolean to show the gas stations map colored or not. |
+| `shortenText` | `false` | Integer of characters to be shown for name and address. Default shows all. |
+| `showAddress` | `true` | Boolean to show the gas stations address. |
+| `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
+| `iconHeader` | `true` | Boolean to display the car icon in the header. |
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
 | `updateInterval` | `900000` (15 mins) | How often should the data be fetched. |
