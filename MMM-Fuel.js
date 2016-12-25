@@ -22,7 +22,8 @@ Module.register("MMM-Fuel", {
         height: 600,
         colored: false,
         open: false,
-        shortenText: false,
+        shortenStation: false,
+		shortenAddress: false,
         showAddress: true,
         showOpenOnly: false,
         iconHeader: true,
@@ -241,8 +242,8 @@ Module.register("MMM-Fuel", {
         var row = document.createElement("tr");
 
         var station_name = data.name;
-        if(this.config.shortenText && station_name.length > this.config.shortenText){
-            station_name = station_name.slice(0, this.config.shortenText) + "&#8230;";
+        if(this.config.shortenStation && station_name.length > this.config.shortenStation){
+            station_name = station_name.slice(0, this.config.shortenStation) + "&#8230;";
         }
         var name = document.createElement("td");
         name.innerHTML = station_name;
@@ -279,9 +280,9 @@ Module.register("MMM-Fuel", {
             var details = document.createElement("tr");
             details.setAttribute("colspan", 2 + this.config.types.length + (this.config.open ? 1 : 0));
 
-            var address_string = ("0" + data.postCode).slice(-5) + " " + data.place + " - " + data.street + " " + data.houseNumber;
-            if(this.config.shortenText && address_string.length > this.config.shortenText){
-                address_string = address_string.slice(0, this.config.shortenText) + "&#8230;";
+            var address_string = ("0" + data.postCode).slice(-5) + " " + data.place.charAt(0).toUpperCase() + data.place.toLowerCase().slice(1) + " - " + data.street + " " + data.houseNumber;
+            if(this.config.shortenAddress && address_string.length > this.config.shortenAddress){
+                address_string = address_string.slice(0, this.config.shortenAddress) + "&#8230;";
             }
             var address = document.createElement("td");
             address.classList.add("xsmall");
