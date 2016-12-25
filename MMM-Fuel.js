@@ -22,7 +22,8 @@ Module.register("MMM-Fuel", {
         height: 600,
         colored: false,
         open: false,
-        shortenText: false,
+        shortenStation: false,
+		shortenAddress: false,
         showAddress: true,
         showOpenOnly: false,
         iconHeader: true,
@@ -241,8 +242,39 @@ Module.register("MMM-Fuel", {
         var row = document.createElement("tr");
 
         var station_name = data.name;
-        if(this.config.shortenText && station_name.length > this.config.shortenText){
-            station_name = station_name.slice(0, this.config.shortenText) + "&#8230;";
+		if(station_name=="Hilden, Herder Str. 44"){
+			station_name="FT Wysocki";
+		}
+		if(station_name.startsWith('JET')){
+			station_name="Jet";
+		}
+		if(station_name.startsWith('TOTAL')){
+			station_name="Total";
+		}
+		if(station_name.startsWith('star')){
+			station_name="Star";
+		}
+		if(station_name.startsWith('Aral')){
+			station_name="Aral";
+		}
+		if(station_name.startsWith('Esso')){
+			station_name="Esso";
+		}
+		if(station_name=="HILDEN, HOCHDAHLER STR"){
+			station_name="Shell";
+		}
+		if(station_name=="HILDEN, WALDER STR."){
+			station_name="Shell";
+		}
+		if(station_name=="ERKRATH, MAX-PLANCK-STR. 81"){
+			station_name="Shell";
+		}
+		if(station_name=="HAAN, GINSTERWEG"){
+			station_name="Shell";
+		}
+		
+        if(this.config.shortenStation && station_name.length > this.config.shortenStation){
+            station_name = station_name.slice(0, this.config.shortenStation) + "&#8230;";
         }
         var name = document.createElement("td");
         name.innerHTML = station_name;
@@ -276,12 +308,33 @@ Module.register("MMM-Fuel", {
         appendTo.appendChild(row);
 
         if(this.config.showAddress){
+			function titleCase(str) {
+				words = str.toLowerCase().split(/-| /);
+
+				for(var i = 0; i < words.length; i++) {
+				var letters = words[i].split('');
+				letters[0] = letters[0].toUpperCase();
+				words[i] = letters.join('');
+				}
+				return words.join(' ');
+			}
             var details = document.createElement("tr");
             details.setAttribute("colspan", 2 + this.config.types.length + (this.config.open ? 1 : 0));
+            var city_string = data.place.charAt(0).toUpperCase() + data.place.toLowerCase().slice(1);
+            var street_string = ((titleCase(data.street)).replace("Straße", "Str.")).replace("Duesseldorf","Düsseldorf");
+			var streetno_string = "";
+			
+			if(data.houseNumber!=null) {
+            streetno_string = data.houseNumber;
+			} else {
+			streetno_string = "";	
+			}
+			
+            var address_string = ("0" + data.postCode).slice(-5) + " " + city_string + " - " + street_string + " " + streetno_string;
+			
 
-            var address_string = ("0" + data.postCode).slice(-5) + " " + data.place + " - " + data.street + " " + data.houseNumber;
-            if(this.config.shortenText && address_string.length > this.config.shortenText){
-                address_string = address_string.slice(0, this.config.shortenText) + "&#8230;";
+            if(this.config.shortenAddress && address_string.length > this.config.shortenAddress){
+                address_string = address_string.slice(0, this.config.shortenAddress) + "&#8230;";
             }
             var address = document.createElement("td");
             address.classList.add("xsmall");
