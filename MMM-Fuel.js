@@ -241,15 +241,19 @@ Module.register('MMM-Fuel', {
         return labelRow;
     },
 
+    shortenText(text) {
+        let temp = text;
+        if (this.config.shortenText && temp.length > this.config.shortenText) {
+            temp = `${temp.slice(0, this.config.shortenText)}&#8230;`;
+        }
+        return temp;
+    },
+
     appendDataRow(data, appendTo) {
         const row = document.createElement('tr');
 
-        let stationName = data.name;
-        if (this.config.shortenText && stationName.length > this.config.shortenText) {
-            stationName = `${stationName.slice(0, this.config.shortenText)}&#8230;`;
-        }
         const name = document.createElement('td');
-        name.innerHTML = stationName;
+        name.innerHTML = this.shortenText(data.name);
         row.appendChild(name);
 
         for (let i = 0; i < this.config.types.length; i += 1) {
@@ -283,13 +287,10 @@ Module.register('MMM-Fuel', {
             const details = document.createElement('tr');
             details.setAttribute('colspan', 2 + this.config.types.length + (this.config.open ? 1 : 0));
 
-            let addressString = `${(`0${data.postCode}`).slice(-5)} ${data.place} - ${data.street} ${data.houseNumber}`;
-            if (this.config.shortenText && addressString.length > this.config.shortenText) {
-                addressString = `${addressString.slice(0, this.config.shortenText)}&#8230;`;
-            }
             const address = document.createElement('td');
             address.classList.add('xsmall');
-            address.innerHTML = addressString;
+            address.innerHTML = this.shortenText(`${(`0${data.postCode}`).slice(-5)} ${data.place} \
+                - ${data.street} ${data.houseNumber}`);
             details.appendChild(address);
 
             appendTo.appendChild(details);

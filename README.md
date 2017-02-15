@@ -12,7 +12,7 @@ Gas Station price Module for MagicMirror<sup>2</sup>
 * OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice)
 * npm
 * [request](https://www.npmjs.com/package/request)
-  
+
 ## Info
 
 The data used in this module comes from [tankerkoenig.de](http://www.tankerkoenig.de) and is only for Gas Stations in Germany.
@@ -25,7 +25,7 @@ or your API access will be suspended.
 
 1. Clone this repo into `~/MagicMirror/modules` directory.
 1. Configure your `~/MagicMirror/config/config.js`:
-    
+
     ```
     {
         module: "MMM-Fuel",
@@ -39,7 +39,7 @@ or your API access will be suspended.
         }
     }
     ```
-    
+
 1. Run command `npm install --productive` in `~/MagicMirror/modules/MMM-Fuel` directory.
 
 ## Config Options
