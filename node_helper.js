@@ -5,19 +5,22 @@
  * MIT Licensed.
  */
 
-const request = require("request");
-const NodeHelper = require("node_helper");
+/* eslint-env node */
+/* eslint-disable no-console */
+
+const request = require('request');
+const NodeHelper = require('node_helper');
 
 module.exports = NodeHelper.create({
 
-    baseUrl: "https://creativecommons.tankerkoenig.de/json/list.php?",
+    baseUrl: 'https://creativecommons.tankerkoenig.de/json/list.php?',
 
-    start: function() {
-        console.log("Starting module: " + this.name);
+    start() {
+        console.log(`Starting module: ${this.name}`);
     },
 
-    socketNotificationReceived: function(notification, payload) {
-        if(notification === "CONFIG"){
+    socketNotificationReceived(notification, payload) {
+        if (notification === 'CONFIG') {
             this.config = payload;
             this.getData();
             setInterval(() => {
@@ -26,48 +29,43 @@ module.exports = NodeHelper.create({
         }
     },
 
-    getData: function() {
-        var options = {
-            url: this.baseUrl +
-                "lat=" + this.config.lat +
-                "&lng=" + this.config.lng +
-                "&rad=" + this.config.radius +
-                "&type=all" +
-                "&apikey=" + this.config.api_key +
-                "&sort=dist"
+    getData() {
+        const options = {
+            url: `${this.baseUrl}lat=${this.config.lat}&lng=${this.config.lng}&rad=${this.config.radius}\
+            &type=all&apikey=${this.config.api_key}&sort=dist`
         };
         request(options, (error, response, body) => {
             if (response.statusCode === 200) {
-                body = JSON.parse(body);
-                if(body.ok) {
-                    for(var i = body.stations.length - 1; i >= 0; i--){
-                        var removeFlag = false;
-                        for(var n = 0; n < this.config.types.length; n++){
-                            if(body.stations[i][this.config.types[n]] <= 0 || (this.config.showOpenOnly && !body.stations[i].isOpen)){
+                const parsedBody = JSON.parse(body);
+                if (parsedBody.ok) {
+                    for (let i = parsedBody.stations.length - 1; i >= 0; i -= 1) {
+                        let removeFlag = false;
+                        for (let n = 0; n < this.config.types.length; n += 1) {
+                            if (parsedBody.stations[i][this.config.types[n]] <= 0 ||
+                                (this.config.showOpenOnly && !parsedBody.stations[i].isOpen)) {
                                 removeFlag = true;
                                 break;
                             }
                         }
-                        if(removeFlag){
-                            body.stations.splice(i, 1);
+                        if (removeFlag) {
+                            parsedBody.stations.splice(i, 1);
                         }
                     }
-                    var price = body.stations.slice(0);
+                    const price = parsedBody.stations.slice(0);
                     price.sort((a, b) => {
-                        if(b[this.config.sortBy] == 0){
+                        if (b[this.config.sortBy] === 0) {
                             return Number.MIN_SAFE_INTEGER;
-                        } else if(a[this.config.sortBy] == 0){
+                        } else if (a[this.config.sortBy] === 0) {
                             return Number.MAX_SAFE_INTEGER;
-                        } else {
-                            return a[this.config.sortBy] - b[this.config.sortBy];
                         }
+                        return a[this.config.sortBy] - b[this.config.sortBy];
                     });
-                    this.sendSocketNotification("PRICELIST", {byPrice: price, byDistance: body.stations});
+                    this.sendSocketNotification('PRICELIST', { byPrice: price, byDistance: parsedBody.stations });
                 } else {
-                    console.log("Error no fuel data");
+                    console.log('Error no fuel data');
                 }
             } else {
-                console.log("Error getting fuel data " + response.statusCode);
+                console.log(`Error getting fuel data ${response.statusCode}`);
             }
         });
     }
