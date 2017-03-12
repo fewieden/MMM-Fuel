@@ -289,8 +289,8 @@ Module.register('MMM-Fuel', {
 
             const address = document.createElement('td');
             address.classList.add('xsmall');
-            address.innerHTML = this.shortenText(`${(`0${data.postCode}`).slice(-5)} ${data.place} \
-                - ${data.street} ${data.houseNumber}`);
+            address.innerHTML = this.shortenText(`${(`0${data.postCode}`).slice(-5)} ${data.place} - ${data.street
+                } ${data.houseNumber}`);
             details.appendChild(address);
 
             appendTo.appendChild(details);
