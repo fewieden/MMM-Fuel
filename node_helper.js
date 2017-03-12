@@ -13,7 +13,7 @@ const NodeHelper = require('node_helper');
 
 module.exports = NodeHelper.create({
 
-    baseUrl: 'https://creativecommons.tankerkoenig.de/json/list.php?',
+    baseUrl: 'https://creativecommons.tankerkoenig.de/json/list.php',
 
     start() {
         console.log(`Starting module: ${this.name}`);
@@ -31,8 +31,8 @@ module.exports = NodeHelper.create({
 
     getData() {
         const options = {
-            url: `${this.baseUrl}lat=${this.config.lat}&lng=${this.config.lng}&rad=${this.config.radius}\
-            &type=all&apikey=${this.config.api_key}&sort=dist`
+            url: `${this.baseUrl}?lat=${this.config.lat}&lng=${this.config.lng}&rad=${this.config.radius
+                }&type=all&apikey=${this.config.api_key}&sort=dist`
         };
         request(options, (error, response, body) => {
             if (response.statusCode === 200) {
