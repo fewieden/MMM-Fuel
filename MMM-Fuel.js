@@ -25,6 +25,7 @@ Module.register('MMM-Fuel', {
         colored: false,
         open: false,
         shortenText: false,
+        shortenAddress: false,
         showAddress: true,
         showOpenOnly: false,
         iconHeader: true,
@@ -248,6 +249,14 @@ Module.register('MMM-Fuel', {
         }
         return temp;
     },
+    
+    shortenAddress(text) {
+        let temp = text;
+        if (this.config.shortenAddress && temp.length > this.config.shortenAddress) {
+            temp = `${temp.slice(0, this.config.shortenAddress)}&#8230;`;
+        }
+        return temp;
+    },
 
     appendDataRow(data, appendTo) {
         const row = document.createElement('tr');
@@ -289,7 +298,7 @@ Module.register('MMM-Fuel', {
 
             const address = document.createElement('td');
             address.classList.add('xsmall');
-            address.innerHTML = this.shortenText(`${(`0${data.postCode}`).slice(-5)} ${data.place} - ${data.street
+            address.innerHTML = this.shortenAddress(`${(`0${data.postCode}`).slice(-5)} ${data.place} - ${data.street
                 } ${data.houseNumber}`);
             details.appendChild(address);
 
