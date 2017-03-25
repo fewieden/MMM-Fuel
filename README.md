@@ -59,8 +59,9 @@ or your API access will be suspended.
 | `height` | `600` | Height of the map in pixel. |
 | `width` | `600` | Width of the map in pixel. |
 | `colored` | `false` | Boolean to show the gas stations map colored or not. |
-| `shortenText` | `false` | Integer of characters to be shown for name and address. Default shows all. |
+| `shortenText` | `false` | Integer of characters to be shown for name. Default shows all. |
 | `showAddress` | `true` | Boolean to show the gas stations address. |
+| `shortenAddress` | `false` | Integer of characters to be shown for address. Default shows all. |
 | `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
 | `iconHeader` | `true` | Boolean to display the car icon in the header. |
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
