@@ -81,3 +81,7 @@ The voice control mode for this module is `FUEL`
 * CLOSE HELP -> Hides the help information.
 * SHOW GAS STATIONS MAP -> Shows a map with the gas stations labeled by Price starting with 1.
 * HIDE GAS STATIONS MAP -> Hide the map.
+
+## API Provider Development
+
+If you want to add another api provider checkout the [Guide](apis).
