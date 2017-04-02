@@ -1,5 +1,3 @@
-/* global Module Log google*/
-
 /* Magic Mirror
  * Module: MMM-Fuel
  *
@@ -7,7 +5,19 @@
  * MIT Licensed.
  */
 
+/* global Module Log config google */
+
 Module.register('MMM-Fuel', {
+
+    units: {
+        imperial: 'ml',
+        metric: 'km'
+    },
+
+    currencies: {
+        EUR: '€',
+        USD: '$'
+    },
 
     sortByPrice: true,
     help: false,
@@ -31,8 +41,9 @@ Module.register('MMM-Fuel', {
         rotate: true,
         types: ['diesel'],
         sortBy: 'diesel',
-        rotateInterval: 60 * 1000,           // every minute
-        updateInterval: 15 * 60 * 1000       // every 15 minutes
+        rotateInterval: 60 * 1000, // every minute
+        updateInterval: 15 * 60 * 1000, // every 15 minutes
+        provider: 'tankerkoenig'
     },
 
     voice: {
@@ -159,8 +170,8 @@ Module.register('MMM-Fuel', {
                         const script = document.createElement('script');
                         script.innerHTML = `var MMM_Fuel_map = \
                             new google.maps.Map(document.querySelector('div.MMM-Fuel-map'), \
-                            {center: new google.maps.LatLng(${parseFloat(this.config.lat)}, \
-                            ${parseFloat(this.config.lng)}), zoom: ${this.config.zoom}, disableDefaultUI:true});
+                            {center: new google.maps.LatLng(${this.config.lat}, \
+                            ${this.config.lng}), zoom: ${this.config.zoom}, disableDefaultUI:true});
                             var trafficLayer = new google.maps.TrafficLayer();
                             trafficLayer.setMap(MMM_Fuel_map);
                             var MMM_Fuel_array = ${JSON.stringify(this.priceList.byPrice)};
@@ -198,20 +209,20 @@ Module.register('MMM-Fuel', {
         labelRow.appendChild(sortLabel);
 
         for (let i = 0; i < this.config.types.length; i += 1) {
-            const typeLabel = document.createElement('th');
-            typeLabel.classList.add('centered');
+            if (this.priceList.types.includes(this.config.types[i])) {
+                const typeLabel = document.createElement('th');
+                typeLabel.classList.add('centered');
 
-            const typeSpan = document.createElement('span');
-            typeSpan.innerHTML = this.config.types[i].charAt(0).toUpperCase() + this.config.types[i].slice(1);
-            typeLabel.appendChild(typeSpan);
+                const typeSpan = document.createElement('span');
+                typeSpan.innerHTML = this.capitalizeFirstLetter(this.config.types[i]);
+                typeLabel.appendChild(typeSpan);
 
-            if (this.sortByPrice && this.config.sortBy === this.config.types[i]) {
-                const sortIcon = document.createElement('i');
-                sortIcon.classList.add('fa', 'fa-long-arrow-down', 'sortBy');
-                typeLabel.appendChild(sortIcon);
+                if (this.sortByPrice && this.config.sortBy === this.config.types[i]) {
+                    typeLabel.appendChild(this.createSortIcon());
+                }
+
+                labelRow.appendChild(typeLabel);
             }
-
-            labelRow.appendChild(typeLabel);
         }
 
         const distanceIconLabel = document.createElement('th');
@@ -222,9 +233,7 @@ Module.register('MMM-Fuel', {
         distanceIconLabel.appendChild(distanceIcon);
 
         if (!this.sortByPrice) {
-            const sortIcon = document.createElement('i');
-            sortIcon.classList.add('fa', 'fa-long-arrow-down', 'sortBy');
-            distanceIconLabel.appendChild(sortIcon);
+            distanceIconLabel.appendChild(this.createSortIcon());
         }
 
         labelRow.appendChild(distanceIconLabel);
@@ -257,16 +266,30 @@ Module.register('MMM-Fuel', {
         row.appendChild(name);
 
         for (let i = 0; i < this.config.types.length; i += 1) {
-            const price = document.createElement('td');
-            price.classList.add('centered');
-            price.innerHTML = `${data[this.config.types[i]]} €`;
-            row.appendChild(price);
+            if (this.priceList.types.includes(this.config.types[i])) {
+                const price = document.createElement('td');
+                price.classList.add('centered');
+                if (data.prices[this.config.types[i]] === -1) {
+                    price.innerHTML = '-';
+                } else {
+                    price.innerHTML = `${data.prices[this.config.types[i]].toFixed(2)} ${
+                        this.currencies[this.priceList.currency]}`;
+                }
+                row.appendChild(price);
+            }
         }
 
-        const distance = document.createElement('td');
-        distance.classList.add('centered');
-        distance.innerHTML = `${data.dist} km`;
-        row.appendChild(distance);
+        const distanceUnit = this.units[config.units];
+        let distance = data.distance;
+
+        if (distanceUnit !== this.priceList.unit) {
+            distance = this[`${this.priceList.unit}2${distanceUnit}`](distance);
+        }
+
+        const distanceColumn = document.createElement('td');
+        distanceColumn.classList.add('centered');
+        distanceColumn.innerHTML = `${distance.toFixed(2)} ${distanceUnit}`;
+        row.appendChild(distanceColumn);
 
         if (this.config.open) {
             const lockUnlockIconLabel = document.createElement('td');
@@ -289,8 +312,7 @@ Module.register('MMM-Fuel', {
 
             const address = document.createElement('td');
             address.classList.add('xsmall');
-            address.innerHTML = this.shortenText(`${(`0${data.postCode}`).slice(-5)} ${data.place} - ${data.street
-                } ${data.houseNumber}`);
+            address.innerHTML = this.shortenText(data.address);
             details.appendChild(address);
 
             appendTo.appendChild(details);
@@ -339,5 +361,23 @@ Module.register('MMM-Fuel', {
             list.appendChild(item);
         }
         appendTo.appendChild(list);
+    },
+
+    createSortIcon() {
+        const sortIcon = document.createElement('i');
+        sortIcon.classList.add('fa', 'fa-long-arrow-down', 'sortBy');
+        return sortIcon;
+    },
+
+    capitalizeFirstLetter(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    },
+
+    km2ml(value) {
+        return value * 0.62137;
+    },
+
+    ml2km(value) {
+        return value * 1.60934;
     }
 });
