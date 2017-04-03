@@ -6,7 +6,6 @@
  */
 
 /* eslint-env node */
-/* eslint-disable no-console */
 
 const NodeHelper = require('node_helper');
 const fs = require('fs');
