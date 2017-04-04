@@ -103,28 +103,37 @@ module.exports = (config) => {
                     const collection = {};
                     responses.forEach((element) => { collection[element.type] = element.data; });
 
-                    const stations = collection[config.sortBy];
+                    let stations = collection[config.sortBy];
                     delete collection[config.sortBy];
+                    const keys = Object.keys(collection);
 
                     stations.forEach((value, index) => {
                         stations[index].name = value.gasStationName;
                         stations[index].prices = { [config.sortBy]: reducePrice(value.spritPrice) };
+                        keys.forEach((type) => { stations[index].prices[type] = -1; });
                         stations[index].isOpen = value.open;
                         stations[index].address = `${value.postalCode} ${value.city} - ${value.address}`;
                         stations[index].lat = parseFloat(value.latitude);
                         stations[index].lng = parseFloat(value.longitude);
                     });
 
-                    const keys = Object.keys(collection);
-                    keys.forEach((key) => {
-                        collection[key].forEach((station) => {
+                    keys.forEach((type) => {
+                        collection[type].forEach((station) => {
                             for (let i = 0; i < stations.length; i += 1) {
                                 if (compareStations(station, stations[i])) {
-                                    stations[i].prices[key] = reducePrice(station.spritPrice);
+                                    stations[i].prices[type] = reducePrice(station.spritPrice);
                                     break;
                                 }
                             }
                         });
+                    });
+
+                    stations = stations.filter((station) => {
+                        const prices = Object.keys(station.prices);
+                        if (prices.every(type => station.prices[type] === -1)) {
+                            return false;
+                        }
+                        return true;
                     });
 
                     const distance = stations.slice(0);
