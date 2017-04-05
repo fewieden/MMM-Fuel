@@ -8,50 +8,19 @@
 /* eslint-env node */
 
 const request = require('request');
-
-const baseUrl = 'http://www.spritpreisrechner.at/espritmap-app/GasStationServlet';
-
-const earthRadius = 6371e3;
-
-const types = {
-    diesel: 'DIE',
-    e5: 'SUP',
-    gas: 'GAS'
-};
+const Coordinate = require('./utils/Coordinate.js');
 
 module.exports = (config) => {
-    const deg2rad = degree => degree * (Math.PI / 180);
+    const baseUrl = 'http://www.spritpreisrechner.at/espritmap-app/GasStationServlet';
 
-    const rad2deg = rad => rad * (180 / Math.PI);
-
-    const calculateCoordinate = (degree) => {
-        const radius = config.radius * 1000;
-        const distance = Math.sqrt(2 * (radius * radius));
-
-        const δ = Number(distance) / earthRadius;
-        const θ = deg2rad(Number(degree));
-
-        const φ1 = deg2rad(config.lat);
-        const λ1 = deg2rad(config.lng);
-
-        const sinφ1 = Math.sin(φ1);
-        const cosφ1 = Math.cos(φ1);
-        const sinδ = Math.sin(δ);
-        const cosδ = Math.cos(δ);
-        const sinθ = Math.sin(θ);
-        const cosθ = Math.cos(θ);
-
-        const sinφ2 = (sinφ1 * cosδ) + (cosφ1 * sinδ * cosθ);
-        const φ2 = Math.asin(sinφ2);
-        const y = sinθ * sinδ * cosφ1;
-        const x = cosδ - (sinφ1 * sinφ2);
-        const λ2 = λ1 + Math.atan2(y, x);
-
-        return { lat: rad2deg(φ2), lng: ((rad2deg(λ2) + 540) % 360) - 180 };
+    const types = {
+        diesel: 'DIE',
+        e5: 'SUP',
+        gas: 'GAS'
     };
 
-    const topLeft = calculateCoordinate(315);
-    const bottomRight = calculateCoordinate(135);
+    const topLeft = Coordinate.from(config.lat, config.lng).to(315, config.radius);
+    const bottomRight = Coordinate.to(135, config.radius);
 
     const generateOptions = type => ({
         url: baseUrl,
@@ -95,6 +64,27 @@ module.exports = (config) => {
         return current < newAmount ? newAmount : current;
     }, -1);
 
+    const filterStations = (station) => {
+        const prices = Object.keys(station.prices);
+        return !prices.every(type => station.prices[type] === -1);
+    };
+
+    const sortByDistance = (a, b) => a.distance - b.distance;
+
+    const normalizeStations = (stations, keys) => {
+        stations.forEach((value, index) => {
+            /* eslint-disable no-param-reassign */
+            stations[index].name = value.gasStationName;
+            stations[index].prices = { [config.sortBy]: reducePrice(value.spritPrice) };
+            keys.forEach((type) => { stations[index].prices[type] = -1; });
+            stations[index].isOpen = value.open;
+            stations[index].address = `${value.postalCode} ${value.city} - ${value.address}`;
+            stations[index].lat = parseFloat(value.latitude);
+            stations[index].lng = parseFloat(value.longitude);
+            /* eslint-enable no-param-reassign */
+        });
+    };
+
     return {
         getData(callback) {
             Promise
@@ -107,15 +97,7 @@ module.exports = (config) => {
                     delete collection[config.sortBy];
                     const keys = Object.keys(collection);
 
-                    stations.forEach((value, index) => {
-                        stations[index].name = value.gasStationName;
-                        stations[index].prices = { [config.sortBy]: reducePrice(value.spritPrice) };
-                        keys.forEach((type) => { stations[index].prices[type] = -1; });
-                        stations[index].isOpen = value.open;
-                        stations[index].address = `${value.postalCode} ${value.city} - ${value.address}`;
-                        stations[index].lat = parseFloat(value.latitude);
-                        stations[index].lng = parseFloat(value.longitude);
-                    });
+                    normalizeStations(stations, keys);
 
                     keys.forEach((type) => {
                         collection[type].forEach((station) => {
@@ -128,16 +110,10 @@ module.exports = (config) => {
                         });
                     });
 
-                    stations = stations.filter((station) => {
-                        const prices = Object.keys(station.prices);
-                        if (prices.every(type => station.prices[type] === -1)) {
-                            return false;
-                        }
-                        return true;
-                    });
+                    stations = stations.filter(filterStations);
 
                     const distance = stations.slice(0);
-                    distance.sort((a, b) => a.distance - b.distance);
+                    distance.sort(sortByDistance);
 
                     callback(null, {
                         types: ['diesel', 'e5', 'gas'],
