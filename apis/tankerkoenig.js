@@ -1,22 +1,52 @@
-/* Magic Mirror
- * Module: MMM-Fuel
+/**
+ * @file apis/tankerkoenig.js
  *
- * By fewieden https://github.com/fewieden/MMM-Fuel
- * MIT Licensed.
+ * @author fewieden
+ * @license MIT
+ *
+ * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* eslint-env node */
-
+/**
+ * @external request
+ * @see https://www.npmjs.com/package/request
+ */
 const request = require('request');
 
+/**
+ * @module apis/tankerkoenig
+ * @description Queries data from tankerkoenig.de
+ *
+ * @requires external:request
+ *
+ * @param {Object} config - Configuration.
+ * @param {number} config.lat - Latitude of Coordinate.
+ * @param {number} config.lng - Longitude of Coordinate.
+ * @param {int} config.radius - Lookup area for gas stations.
+ * @param {string} config.sortBy - Type to sort by price.
+ * @param {string[]} config.types - Requested fuel types.
+ * @param {boolean} config.showOpenOnly - Flag to show only open gas stations.
+ *
+ * @see https://creativecommons.tankerkoenig.de/
+ */
 module.exports = (config) => {
+    /** @member {string} baseUrl - API url */
     const baseUrl = 'https://creativecommons.tankerkoenig.de/json/list.php';
 
+    /** @member {Object} options - API url combined with config options. */
     const options = {
         url: `${baseUrl}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
             config.api_key}&sort=dist`
     };
 
+    /**
+     * @function sortByPrice
+     * @description Helper function to sort gas stations by price.
+     *
+     * @param {Object} a - Gas Station
+     * @param {Object} b - Gas Station
+     * @returns {number}
+     */
     const sortByPrice = (a, b) => {
         if (b[config.sortBy] === 0) {
             return Number.MIN_SAFE_INTEGER;
@@ -26,15 +56,32 @@ module.exports = (config) => {
         return a[config.sortBy] - b[config.sortBy];
     };
 
-    const filterStations = (element) => {
+    /**
+     * @function filterStations
+     * @description Helper function to filter gas stations.
+     *
+     * @param {Object} station - Gas Station
+     * @returns {boolean}
+     */
+    const filterStations = (station) => {
         for (let i = 0; i < config.types.length; i += 1) {
-            if (element[config.types[i]] <= 0 || (config.showOpenOnly && !element.isOpen)) {
+            if (station[config.types[i]] <= 0 || (config.showOpenOnly && !station.isOpen)) {
                 return false;
             }
         }
         return true;
     };
 
+    /**
+     * @function normalizeStations
+     * @description Helper function to normalize the structure of gas stations for the UI.
+     *
+     * @param {Object} value - Gas Station
+     * @param {int} index - Array index
+     * @param {Object[]} stations - Original Array.
+     *
+     * @see apis/README.md
+     */
     const normalizeStations = (value, index, stations) => {
         /* eslint-disable no-param-reassign */
         stations[index].prices = {
@@ -49,6 +96,20 @@ module.exports = (config) => {
     };
 
     return {
+        /**
+         * @callback getDataCallback
+         * @param {?string} error - Error message.
+         * @param {Object} data - API data.
+         *
+         * @see apis/README.md
+         */
+
+        /**
+         * @function getData
+         * @description Performs the data query and processing.
+         *
+         * @param {getDataCallback} callback - Callback that handles the API data.
+         */
         getData(callback) {
             request(options, (error, response, body) => {
                 if (response.statusCode === 200) {

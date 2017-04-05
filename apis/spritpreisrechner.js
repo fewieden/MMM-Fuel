@@ -1,27 +1,57 @@
-/* Magic Mirror
- * Module: MMM-Fuel
+/**
+ * @file apis/spritpreisrechner.js
  *
- * By fewieden https://github.com/fewieden/MMM-Fuel
- * MIT Licensed.
+ * @author fewieden
+ * @license MIT
+ *
+ * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* eslint-env node */
-
+/**
+ * @external request
+ * @see https://www.npmjs.com/package/request
+ */
 const request = require('request');
 const Coordinate = require('./utils/Coordinate.js');
 
+/**
+ * @module apis/spritpreisrechner
+ * @description Queries data from spritpreisrechner.at
+ *
+ * @requires external:request
+ * @requires module:Coordinate
+ *
+ * @param {Object} config - Configuration.
+ * @param {number} config.lat - Latitude of Coordinate.
+ * @param {number} config.lng - Longitude of Coordinate.
+ * @param {int} config.radius - Lookup area for gas stations.
+ * @param {string} config.sortBy - Type to sort by price.
+ * @param {string[]} config.types - Requested fuel types.
+ * @param {boolean} config.showOpenOnly - Flag to show only open gas stations.
+ */
 module.exports = (config) => {
+    /** @member {string} baseUrl - API url */
     const baseUrl = 'http://www.spritpreisrechner.at/espritmap-app/GasStationServlet';
 
+    /** @member {Object} types - Mapping of fuel types to API fuel types. */
     const types = {
         diesel: 'DIE',
         e5: 'SUP',
         gas: 'GAS'
     };
 
+    /** @member {Object} topLeft - Top left corner of lookup area. */
     const topLeft = Coordinate.from(config.lat, config.lng).to(315, config.radius);
+    /** @member {Object} bottomRight - Bottom right corner of lookup area. */
     const bottomRight = Coordinate.to(135, config.radius);
 
+    /**
+     * @function generateOptions
+     * @description Helper function to generate API request options.
+     *
+     * @param {string} type - Fuel type
+     * @returns {Object} Options
+     */
     const generateOptions = type => ({
         url: baseUrl,
         method: 'POST',
@@ -41,6 +71,13 @@ module.exports = (config) => {
         }`
     });
 
+    /**
+     * @function requestFuelType
+     * @description API request for specified type.
+     *
+     * @param {string} type - Fuel type.
+     * @returns {Promise} Data or error message.
+     */
     const requestFuelType = type => new Promise((resolve, reject) => {
         request(generateOptions(type), (error, response, body) => {
             if (response.statusCode === 200) {
@@ -50,13 +87,28 @@ module.exports = (config) => {
         });
     });
 
+    /**
+     * @function compareStations
+     * @description Helper function to compare gas stations.
+     *
+     * @param {Object} a - Gas Station
+     * @param {Object} b - Gas Station
+     * @returns {boolean}
+     */
     const compareStations = (a, b) => a.city === b.city &&
         a.postalCode === b.postalCode &&
         a.gasStationName === b.gasStationName &&
         a.latitude === b.latitude &&
         a.longitude === b.longitude;
 
-    const reducePrice = array => array.reduce((current, price) => {
+    /**
+     * @function reducePrice
+     * @description Reduces array of prices to single price.
+     *
+     * @param {Object[]} prices - All prices.
+     * @returns {number} Highest price or -1 if there is no price.
+     */
+    const reducePrice = prices => prices.reduce((current, price) => {
         if (!Object.prototype.hasOwnProperty.call(price, 'amount') || price.amount === '') {
             return current;
         }
@@ -64,13 +116,37 @@ module.exports = (config) => {
         return current < newAmount ? newAmount : current;
     }, -1);
 
+    /**
+     * @function filterStations
+     * @description Helper function to filter gas stations.
+     *
+     * @param {Object} station - Gas Station
+     * @returns {boolean}
+     */
     const filterStations = (station) => {
         const prices = Object.keys(station.prices);
         return !prices.every(type => station.prices[type] === -1);
     };
 
+    /**
+     * @function sortByDistance
+     * @description Helper function to sort gas stations by distance.
+     *
+     * @param {Object} a - Gas Station
+     * @param {Object} b - Gas Station
+     * @returns {number}
+     */
     const sortByDistance = (a, b) => a.distance - b.distance;
 
+    /**
+     * @function normalizeStations
+     * @description Helper function to normalize the structure of gas stations for the UI.
+     *
+     * @param {Object[]} stations - Gas Station.
+     * @param {string[]} keys - Fuel types except config option sortBy.
+     *
+     * @see apis/README.md
+     */
     const normalizeStations = (stations, keys) => {
         stations.forEach((value, index) => {
             /* eslint-disable no-param-reassign */
@@ -86,6 +162,20 @@ module.exports = (config) => {
     };
 
     return {
+        /**
+         * @callback getDataCallback
+         * @param {?string} error - Error message.
+         * @param {Object} data - API data.
+         *
+         * @see apis/README.md
+         */
+
+        /**
+         * @function getData
+         * @description Performs the data query and processing.
+         *
+         * @param {getDataCallback} callback - Callback that handles the API data.
+         */
         getData(callback) {
             Promise
                 .all(config.types.map(requestFuelType))

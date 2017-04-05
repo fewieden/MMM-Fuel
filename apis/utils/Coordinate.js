@@ -1,26 +1,66 @@
-/* Magic Mirror
- * Module: MMM-Fuel
+/**
+ * @file apis/utils/Coordinate.js
  *
- * By fewieden https://github.com/fewieden/MMM-Fuel
- * MIT Licensed.
+ * @author fewieden
+ * @license MIT
+ *
+ * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* eslint-env node */
-
+/**
+ * Earth radius in meter.
+ * @type {number}
+ */
 const earth = 6371e3;
 
+/**
+ * @function deg2rad
+ * @description Converts degree to radian.
+ *
+ * @param {number} degree - Value to convert.
+ * @returns {number} Converted value.
+ */
 const deg2rad = degree => degree * (Math.PI / 180);
 
+/**
+ * @function rad2deg
+ * @description Converts radian to degree.
+ *
+ * @param {number} rad - Value to convert.
+ * @returns {number} Converted value.
+ */
 const rad2deg = rad => rad * (180 / Math.PI);
 
+/**
+ * @module apis/utils/Coordinate
+ * @description Utility to calculate target Coordinate based of a start Coordinate.
+ */
 module.exports = {
 
+    /**
+     * @function from
+     * @description Sets the start Coordinate.
+     *
+     * @param {number} lat - Latitude of a Coordinate
+     * @param {number} lng - Longitude of a Coordinate
+     * @returns {module:Coordinate}
+     */
     from(lat, lng) {
         this.lat = lat;
         this.lng = lng;
         return this;
     },
 
+    /**
+     * @function to
+     * @description Calculates the target Coordinate.
+     *
+     * @param {number} degree - Direction to the target (North is 0).
+     * @param {number} distance - Distance in kilometres to the target.
+     * @returns {Object.<string, number>} Target Coordinate.
+     *
+     * @see https://github.com/chrisveness/geodesy
+     */
     to(degree, distance) {
         const radius = distance * 1000;
 

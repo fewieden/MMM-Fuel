@@ -1,30 +1,74 @@
-/* Magic Mirror
- * Module: MMM-Fuel
+/**
+ * @file MMM-Fuel.js
  *
- * By fewieden https://github.com/fewieden/MMM-Fuel
- * MIT Licensed.
+ * @author fewieden
+ * @license MIT
+ *
+ * @see  https://github.com/fewieden/MMM-Fuel
  */
 
 /* global Module Log config google */
 
+/**
+ * @external Module
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/module.js
+ */
+
+/**
+ * @external Log
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
+ */
+
+/**
+ * @module MMM-Fuel
+ * @description Frontend for the module to display data.
+ *
+ * @requires external:Module
+ * @requires external:Log
+ */
 Module.register('MMM-Fuel', {
 
+    /** @member {Object} units - Is used to determine the unit symbol of the global config option units. */
     units: {
         imperial: 'ml',
         metric: 'km'
     },
 
+    /** @member {Object} currencies - Is used to convert currencies into symbols. */
     currencies: {
-        EUR: '€',
-        USD: '$'
+        EUR: '€'
     },
 
+    /** @member {boolean} sortByPrice - Flag to switch between sorting (price and distance). */
     sortByPrice: true,
+    /** @member {boolean} help - Flag to switch between render help or not. */
     help: false,
+    /** @member {boolean} map - Flag to switch between render map or not. */
     map: false,
-    mapUI: null,
+    /** @member {?Interval} interval - Toggles sortByPrice */
     interval: null,
 
+    /**
+     * @member {Object} defaults - Defines the default config values.
+     * @property {int} radius - Lookup area for gas stations.
+     * @property {int} max - Amount of gas stations to display.
+     * @property {boolean|string} map_api_key - API key for Google Maps.
+     * @property {int} zoom - Zoom level of the map.
+     * @property {int} width - Width of the map.
+     * @property {int} height - Height of the map.
+     * @property {boolean} colored - Flag to render map in colour or greyscale.
+     * @property {boolean} open - Flag to render column to indicate if the gas stations are open or closed.
+     * @property {boolean|int} shortenText - Max characters to be shown for name and address.
+     * @property {boolean} showAddress - Flag to show the gas stations address.
+     * @property {boolean} showOpenOnly - Flag to show only open gas stations or all.
+     * @property {boolean} iconHeader - Flag to display the car icon in the header.
+     * @property {boolean} rotate - Flag to enable/disable rotation between sort by price and distance.
+     * @property {string[]} types - Fuel types to show.
+     * @property {string} sortBy - Type to sort by price.
+     * @property {int} rotateInterval - Speed of rotation.
+     * @property {int} updateInterval - Speed of update.
+     * @property {string} provider - API provider of the data.
+     */
     defaults: {
         radius: 5,
         max: 5,
@@ -46,6 +90,11 @@ Module.register('MMM-Fuel', {
         provider: 'tankerkoenig'
     },
 
+    /**
+     * @member {Object} voice - Defines the voice recognition part.
+     * @property {string} mode - MMM-voice mode of this module.
+     * @property {string[]} sentences - All commands of this module.
+     */
     voice: {
         mode: 'FUEL',
         sentences: [
@@ -56,6 +105,12 @@ Module.register('MMM-Fuel', {
         ]
     },
 
+    /**
+     * @function getTranslations
+     * @description Translations for this module.
+     *
+     * @returns {Object.<string, string>} Available translations for this module (key: language code, value: filepath).
+     */
     getTranslations() {
         return {
             en: 'translations/en.json',
@@ -63,10 +118,22 @@ Module.register('MMM-Fuel', {
         };
     },
 
+    /**
+     * @function getStyles
+     * @description Style dependencies for this module.
+     *
+     * @returns {string[]} List of the style dependency filepaths.
+     */
     getStyles() {
         return ['font-awesome.css', 'MMM-Fuel.css'];
     },
 
+    /**
+     * @function start
+     * @description Appends Google Map script to the body, if the config option map_api_key is defined. Calls
+     * createInterval and sends the config to the node_helper.
+     * @override
+     */
     start() {
         Log.info(`Starting module: ${this.name}`);
         // Add script manually, getScripts doesn't work for it!
@@ -79,6 +146,11 @@ Module.register('MMM-Fuel', {
         this.sendSocketNotification('CONFIG', this.config);
     },
 
+    /**
+     * @function createInterval
+     * @description Creates an interval if config option rotate is set.
+     * @returns {?Interval} The Interval toggles sortByPrice between true and false.
+     */
     createInterval() {
         if (!this.config.rotate) {
             return null;
@@ -89,6 +161,14 @@ Module.register('MMM-Fuel', {
         }, this.config.rotateInterval);
     },
 
+    /**
+     * @function notificationReceived
+     * @description Handles incoming broadcasts from other modules or the MagicMirror core.
+     *
+     * @param {string} notification - Notification name
+     * @param {*} payload - Detailed payload of the notification.
+     * @param {MM} [sender] - The sender of the notification. If sender is undefined the sender is the core.
+     */
     notificationReceived(notification, payload, sender) {
         if (notification === 'ALL_MODULES_STARTED') {
             this.sendNotification('REGISTER_VOICE_MODULE', this.voice);
@@ -101,6 +181,13 @@ Module.register('MMM-Fuel', {
         }
     },
 
+    /**
+     * @function socketNotificationReceived
+     * @description Handles incoming messages from node_helper.
+     *
+     * @param {string} notification - Notification name
+     * @param {*} payload - Detailed payload of the notification.
+     */
     socketNotificationReceived(notification, payload) {
         if (notification === 'PRICELIST') {
             this.priceList = payload;
@@ -108,6 +195,13 @@ Module.register('MMM-Fuel', {
         }
     },
 
+    /**
+     * @function getDom
+     * @description Creates the UI as DOM for displaying in MagicMirror application.
+     * @override
+     *
+     * @returns {Element}
+     */
     getDom() {
         const wrapper = document.createElement('div');
         const list = document.createElement('div');
@@ -197,6 +291,12 @@ Module.register('MMM-Fuel', {
         return wrapper;
     },
 
+    /**
+     * @function createLabelRow
+     * @description Creates label row for price table.
+     *
+     * @returns {Element}
+     */
     createLabelRow() {
         const labelRow = document.createElement('tr');
 
@@ -250,6 +350,14 @@ Module.register('MMM-Fuel', {
         return labelRow;
     },
 
+    /**
+     * @function shortenText
+     * @description Shortens text based on config option (shortenText) and adds ellipsis at the end.
+     *
+     * @param {string} text - Text which should be shorten.
+     *
+     * @returns {string} The shortened text.
+     */
     shortenText(text) {
         let temp = text;
         if (this.config.shortenText && temp.length > this.config.shortenText) {
@@ -258,6 +366,33 @@ Module.register('MMM-Fuel', {
         return temp;
     },
 
+    /**
+     * @function appendDataRow
+     * @description Creates the UI for the station price table.
+     *
+     * @param {Object} data - Information about a station.
+     * @param {string} data.name - The gas station name.
+     * @param {Object.<string, number>} data.prices - Prices (value) of the different fuel types (key).
+     * @param {number} data.distance - Distance between user location and gas station.
+     * @param {boolean} data.isOpen - Indicator if the gas station is currently open or closed.
+     * @param {string} data.address - Address of the gas station in the format: Postcode City - Street Housenumber.
+     * @param {Element} appendTo - DOM Element where the UI gets appended as child.
+     *
+     * @example <caption>data object</caption>
+     * {
+     *   "name": "Aral Tankstelle",
+     *   "prices": {
+     *     "diesel": 1.009,
+     *     "e5": 1.009,
+     *     "e10": 1.009
+     *   },
+     *   "distance": 2.2,
+     *   "isOpen": true,
+     *   "address": "70372 Stuttgart - Waiblinger Straße 23-25",
+     *   "lat": 48.8043442,
+     *   "lng": 9.220273
+     * }
+     */
     appendDataRow(data, appendTo) {
         const row = document.createElement('tr');
 
@@ -319,6 +454,12 @@ Module.register('MMM-Fuel', {
         }
     },
 
+    /**
+     * @function checkCommands
+     * @description Checks for voice commands.
+     *
+     * @param {string} data - Text with commands.
+     */
     checkCommands(data) {
         if (/(HELP)/g.test(data)) {
             if (/(CLOSE)/g.test(data) || (this.help && !/(OPEN)/g.test(data))) {
@@ -340,6 +481,12 @@ Module.register('MMM-Fuel', {
         this.updateDom(300);
     },
 
+    /**
+     * @function appendTo
+     * @description Creates the UI for the voice command SHOW HELP.
+     *
+     * @param {Element} appendTo - DOM Element where the UI gets appended as child.
+     */
     appendHelp(appendTo) {
         const title = document.createElement('h1');
         title.classList.add('medium');
@@ -363,20 +510,51 @@ Module.register('MMM-Fuel', {
         appendTo.appendChild(list);
     },
 
+    /**
+     * @function createSortIcon
+     * @description Creates a DOM Element with the FontAwesome icon
+     * fa-long-arrow-down {@link http://fontawesome.io/icons/}.
+     *
+     * @returns {Element} Element with icon.
+     */
     createSortIcon() {
         const sortIcon = document.createElement('i');
         sortIcon.classList.add('fa', 'fa-long-arrow-down', 'sortBy');
         return sortIcon;
     },
 
+    /**
+     * @function capitalizeFirstLetter
+     * @description Capitalizes the first character in a string.
+     *
+     * @param {string} text - text to capitalize the first letter.
+     *
+     * @returns {string} Capitalized string.
+     */
     capitalizeFirstLetter(text) {
         return text.charAt(0).toUpperCase() + text.slice(1);
     },
 
+    /**
+     * @function km2ml
+     * @description Converts the unit kilometres to miles.
+     *
+     * @param {number} value - Distance in kilometres.
+     *
+     * @returns {number} Distance in miles.
+     */
     km2ml(value) {
         return value * 0.62137;
     },
 
+    /**
+     * @function ml2km
+     * @description Converts the unit miles to kilometres.
+     *
+     * @param {number} value - Distance in miles.
+     *
+     * @returns {number} Distance in kilometres.
+     */
     ml2km(value) {
         return value * 1.60934;
     }
