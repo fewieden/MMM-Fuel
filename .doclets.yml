@@ -1,0 +1,10 @@
+dir: .
+packageJson: package.json
+articles:
+  - Overview: README.md
+  - API Provider: apis/README.md
+  - Changelog: CHANGELOG.md
+  - License: LICENSE
+branches:
+  - master
+  - develop

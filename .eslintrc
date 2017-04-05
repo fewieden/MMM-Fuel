@@ -4,7 +4,8 @@
     "comma-dangle": 0,
 	"indent": [2, 4],
     "max-len": [2, 120, { "ignoreStrings": true }],
-    "radix": [2, "as-needed"]
+    "radix": [2, "as-needed"],
+    "no-console": 0
   },
   "settings": {
     "import/core-modules": [ "node_helper" ]
