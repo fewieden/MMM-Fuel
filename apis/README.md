@@ -12,7 +12,7 @@ To display the data of the stations in the UI, a single station has to be in the
 {
     "name": "Aral Tankstelle", // String
     "prices": {  // Object
-	    "diesel": 1.009, // Float
+        "diesel": 1.009, // Float
         // "type": amount
     },
     "distance": 2.2, // Float
