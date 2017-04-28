@@ -59,16 +59,22 @@ module.exports = {
      * @param {number} distance - Distance in kilometres to the target.
      * @returns {Object.<string, number>} Target Coordinate.
      *
+     * @throws {Error} Error gets thrown if the start Coordinate wasn't set.
+     *
      * @see https://github.com/chrisveness/geodesy
      */
     to(degree, distance) {
+        const φ1 = deg2rad(this.lat);
+        const λ1 = deg2rad(this.lng);
+
+        if (!φ1 || !φ1) {
+            throw new Error('No start Coordinate set!');
+        }
+
         const radius = distance * 1000;
 
         const δ = Math.sqrt(2 * (radius * radius)) / earth;
         const θ = deg2rad(Number(degree));
-
-        const φ1 = deg2rad(this.lat);
-        const λ1 = deg2rad(this.lng);
 
         const sinφ1 = Math.sin(φ1);
         const cosφ1 = Math.cos(φ1);
