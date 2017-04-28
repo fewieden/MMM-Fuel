@@ -68,6 +68,7 @@ Module.register('MMM-Fuel', {
      * @property {int} rotateInterval - Speed of rotation.
      * @property {int} updateInterval - Speed of update.
      * @property {string} provider - API provider of the data.
+     * @property {boolean} toFixed - Flag to show price with only 2 decimals.
      */
     defaults: {
         radius: 5,
@@ -87,7 +88,8 @@ Module.register('MMM-Fuel', {
         sortBy: 'diesel',
         rotateInterval: 60 * 1000, // every minute
         updateInterval: 15 * 60 * 1000, // every 15 minutes
-        provider: 'tankerkoenig'
+        provider: 'tankerkoenig',
+        toFixed: false
     },
 
     /**
@@ -108,6 +110,7 @@ Module.register('MMM-Fuel', {
     /**
      * @function getTranslations
      * @description Translations for this module.
+     * @override
      *
      * @returns {Object.<string, string>} Available translations for this module (key: language code, value: filepath).
      */
@@ -121,6 +124,7 @@ Module.register('MMM-Fuel', {
     /**
      * @function getStyles
      * @description Style dependencies for this module.
+     * @override
      *
      * @returns {string[]} List of the style dependency filepaths.
      */
@@ -164,6 +168,7 @@ Module.register('MMM-Fuel', {
     /**
      * @function notificationReceived
      * @description Handles incoming broadcasts from other modules or the MagicMirror core.
+     * @override
      *
      * @param {string} notification - Notification name
      * @param {*} payload - Detailed payload of the notification.
@@ -184,6 +189,7 @@ Module.register('MMM-Fuel', {
     /**
      * @function socketNotificationReceived
      * @description Handles incoming messages from node_helper.
+     * @override
      *
      * @param {string} notification - Notification name
      * @param {*} payload - Detailed payload of the notification.
@@ -407,7 +413,8 @@ Module.register('MMM-Fuel', {
                 if (data.prices[this.config.types[i]] === -1) {
                     price.innerHTML = '-';
                 } else {
-                    price.innerHTML = `${data.prices[this.config.types[i]].toFixed(2)} ${
+                    price.innerHTML = `${this.config.toFixed ?
+                        data.prices[this.config.types[i]].toFixed(2) : data.prices[this.config.types[i]]} ${
                         this.currencies[this.priceList.currency]}`;
                 }
                 row.appendChild(price);
@@ -482,7 +489,7 @@ Module.register('MMM-Fuel', {
     },
 
     /**
-     * @function appendTo
+     * @function appendHelp
      * @description Creates the UI for the voice command SHOW HELP.
      *
      * @param {Element} appendTo - DOM Element where the UI gets appended as child.

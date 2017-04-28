@@ -1,4 +1,15 @@
-# MMM-WienerLinien Changelog
+# MMM-Fuel Changelog
+
+## [1.1.1]
+
+### Added
+
+* Disabled markdownlint rule `MD024` (no-duplicate-header)
+* Config option `toFixed` to show only 2 decimals for the price.
+
+### Changed
+
+* Coordinate.to() throws exception if start point is not set.
 
 ## [1.1.0]
 
