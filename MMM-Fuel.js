@@ -69,6 +69,7 @@ Module.register('MMM-Fuel', {
      * @property {int} updateInterval - Speed of update.
      * @property {string} provider - API provider of the data.
      * @property {boolean} toFixed - Flag to show price with only 2 decimals.
+     * @property {string[]} ids - List of gas stations to display
      */
     defaults: {
         radius: 5,
@@ -89,7 +90,8 @@ Module.register('MMM-Fuel', {
         rotateInterval: 60 * 1000, // every minute
         updateInterval: 15 * 60 * 1000, // every 15 minutes
         provider: 'tankerkoenig',
-        toFixed: false
+        toFixed: false,
+        ids: []
     },
 
     /**

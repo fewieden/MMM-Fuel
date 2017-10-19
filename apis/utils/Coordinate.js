@@ -90,5 +90,28 @@ module.exports = {
         const λ2 = λ1 + Math.atan2(y, x);
 
         return { lat: rad2deg(φ2), lng: ((rad2deg(λ2) + 540) % 360) - 180 };
+    },
+
+    /**
+     * @function getDistance
+     * @description Calculates the distance between two points.
+     *
+     * @param {Object.<number, number>} - Start point
+     * @param {Object.<number, number>} - Target point
+     * @returns {number} - Distance in kilometers
+     */
+    getDistance(pos1, pos2) {
+        // Algorithm taken from https://stackoverflow.com/a/27943
+        /* eslint-disable no-mixed-operators */
+
+        const dLat = deg2rad(pos2.lat - pos1.lat);
+        const dLon = deg2rad(pos2.lng - pos1.lng);
+
+        const distance = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(pos1.lat)) * Math.cos(deg2rad(pos2.lat)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(distance), Math.sqrt(1 - distance));
+
+        return earth * c / 1000;
     }
 };
