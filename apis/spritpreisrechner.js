@@ -12,14 +12,12 @@
  * @see https://www.npmjs.com/package/request
  */
 const request = require('request');
-const Coordinate = require('./utils/Coordinate.js');
 
 /**
  * @module apis/spritpreisrechner
  * @description Queries data from spritpreisrechner.at
  *
  * @requires external:request
- * @requires module:Coordinate
  *
  * @param {Object} config - Configuration.
  * @param {number} config.lat - Latitude of Coordinate.
@@ -31,7 +29,7 @@ const Coordinate = require('./utils/Coordinate.js');
  */
 module.exports = (config) => {
     /** @member {string} baseUrl - API url */
-    const baseUrl = 'http://www.spritpreisrechner.at/espritmap-app/GasStationServlet';
+    const baseUrl = 'https://api.e-control.at/sprit/1.0';
 
     /** @member {Object} types - Mapping of fuel types to API fuel types. */
     const types = {
@@ -40,11 +38,6 @@ module.exports = (config) => {
         gas: 'GAS'
     };
 
-    /** @member {Object} topLeft - Top left corner of lookup area. */
-    const topLeft = Coordinate.from(config.lat, config.lng).to(315, config.radius);
-    /** @member {Object} bottomRight - Bottom right corner of lookup area. */
-    const bottomRight = Coordinate.to(135, config.radius);
-
     /**
      * @function generateOptions
      * @description Helper function to generate API request options.
@@ -52,23 +45,9 @@ module.exports = (config) => {
      * @param {string} type - Fuel type
      * @returns {Object} Options
      */
+
     const generateOptions = type => ({
-        url: baseUrl,
-        method: 'POST',
-        form: `data=${
-            encodeURI(
-                JSON.stringify(
-                    [
-                        config.showOpenOnly ? '' : 'checked',
-                        types[type],
-                        topLeft.lng,
-                        topLeft.lat,
-                        bottomRight.lng,
-                        bottomRight.lat
-                    ]
-                )
-            )
-        }`
+        url: `${baseUrl}/search/gas-stations/by-address?latitude=${config.lat}&longitude=${config.lng}&fuelType=${types[type]}&includeClosed=${!config.showOpenOnly}`
     });
 
     /**
@@ -95,11 +74,11 @@ module.exports = (config) => {
      * @param {Object} b - Gas Station
      * @returns {boolean}
      */
-    const compareStations = (a, b) => a.city === b.city &&
-        a.postalCode === b.postalCode &&
-        a.gasStationName === b.gasStationName &&
-        a.latitude === b.latitude &&
-        a.longitude === b.longitude;
+    const compareStations = (a, b) => a.location.city === b.location.city &&
+        a.location.postalCode === b.location.postalCode &&
+        a.name === b.name &&
+        a.location.latitude === b.location.latitude &&
+        a.location.longitude === b.location.longitude;
 
     /**
      * @function reducePrice
@@ -112,8 +91,7 @@ module.exports = (config) => {
         if (!Object.prototype.hasOwnProperty.call(price, 'amount') || price.amount === '') {
             return current;
         }
-        const newAmount = parseFloat(price.amount);
-        return current < newAmount ? newAmount : current;
+        return current < price.amount ? price.amount : current;
     }, -1);
 
     /**
@@ -150,13 +128,13 @@ module.exports = (config) => {
     const normalizeStations = (stations, keys) => {
         stations.forEach((value, index) => {
             /* eslint-disable no-param-reassign */
-            stations[index].name = value.gasStationName;
-            stations[index].prices = { [config.sortBy]: reducePrice(value.spritPrice) };
+            stations[index].name = value.name;
+            stations[index].prices = { [config.sortBy]: reducePrice(value.prices) };
             keys.forEach((type) => { stations[index].prices[type] = -1; });
             stations[index].isOpen = value.open;
-            stations[index].address = `${value.postalCode} ${value.city} - ${value.address}`;
-            stations[index].lat = parseFloat(value.latitude);
-            stations[index].lng = parseFloat(value.longitude);
+            stations[index].address = `${value.location.postalCode} ${value.location.city} - ${value.location.address}`;
+            stations[index].lat = parseFloat(value.location.latitude);
+            stations[index].lng = parseFloat(value.location.longitude);
             /* eslint-enable no-param-reassign */
         });
     };
@@ -184,6 +162,9 @@ module.exports = (config) => {
                     responses.forEach((element) => { collection[element.type] = element.data; });
 
                     let stations = collection[config.sortBy];
+
+                    stations = stations.filter((station) => station.distance <= config.radius);
+
                     delete collection[config.sortBy];
                     const keys = Object.keys(collection);
 
@@ -193,7 +174,7 @@ module.exports = (config) => {
                         collection[type].forEach((station) => {
                             for (let i = 0; i < stations.length; i += 1) {
                                 if (compareStations(station, stations[i])) {
-                                    stations[i].prices[type] = reducePrice(station.spritPrice);
+                                    stations[i].prices[type] = reducePrice(station.prices);
                                     break;
                                 }
                             }
