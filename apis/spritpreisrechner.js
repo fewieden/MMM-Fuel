@@ -163,6 +163,17 @@ module.exports = (config) => {
 
                     let stations = collection[config.sortBy];
 
+                    const maxPrices = {};
+                    for (let type in collection) {
+                        for (let station of collection[type]) {
+                            for (let price of station.prices) {
+                                if (!maxPrices[price.fuelType] || price.amount > maxPrices[price.fuelType]) {
+                                    maxPrices[price.fuelType] = price.amount;
+                                }
+                            }
+                        }
+                    }
+
                     stations = stations.filter((station) => station.distance <= config.radius);
 
                     delete collection[config.sortBy];
@@ -180,6 +191,14 @@ module.exports = (config) => {
                             }
                         });
                     });
+
+                    for (let station of stations) {
+                        for (let type in station.prices) {
+                            if (station.prices[type] === -1) {
+                                station.prices[type] = `>${maxPrices[types[type]]}`;
+                            }
+                        }
+                    }
 
                     stations = stations.filter(filterStations);
 
