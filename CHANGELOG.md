@@ -1,5 +1,14 @@
 # MMM-Fuel Changelog
 
+## [2.0.0]
+
+### Changed
+
+* Config files
+* async/await on the node side of the module.
+* fs-extra for promised based filesystem access.
+* replace request with node-fetch.
+
 ## [1.1.1]
 
 ### Added

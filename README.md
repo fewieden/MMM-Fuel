@@ -13,7 +13,8 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
 * OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice)
 * npm
-* [request](https://www.npmjs.com/package/request)
+* [fs-extra](https://www.npmjs.com/package/fs-extra)
+* [node-fetch](https://www.npmjs.com/package/node-fetch)
 
 ## Installation
 
@@ -34,7 +35,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
     }
     ```
 
-1. Run command `npm install --productive` in `~/MagicMirror/modules/MMM-Fuel` directory.
+1. Run command `npm i --production` in `~/MagicMirror/modules/MMM-Fuel` directory.
 
 ## Config Options
 

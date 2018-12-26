@@ -8,16 +8,16 @@
  */
 
 /**
- * @external request
- * @see https://www.npmjs.com/package/request
+ * @external node-fetch
+ * @see https://www.npmjs.com/package/node-fetch
  */
-const request = require('request');
+const fetch = require('node-fetch');
 
 /**
  * @module apis/tankerkoenig
  * @description Queries data from tankerkoenig.de
  *
- * @requires external:request
+ * @requires external:node-fetch
  *
  * @param {Object} config - Configuration.
  * @param {number} config.lat - Latitude of Coordinate.
@@ -33,11 +33,9 @@ module.exports = (config) => {
     /** @member {string} baseUrl - API url */
     const baseUrl = 'https://creativecommons.tankerkoenig.de/json/list.php';
 
-    /** @member {Object} options - API url combined with config options. */
-    const options = {
-        url: `${baseUrl}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
-            config.api_key}&sort=dist`
-    };
+    /** @member {string} url - API url combined with config options. */
+    const url = `${baseUrl}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
+            config.api_key}&sort=dist`;
 
     /**
      * @function sortByPrice
@@ -97,45 +95,33 @@ module.exports = (config) => {
 
     return {
         /**
-         * @callback getDataCallback
-         * @param {?string} error - Error message.
-         * @param {Object} data - API data.
-         *
-         * @see apis/README.md
-         */
-
-        /**
          * @function getData
          * @description Performs the data query and processing.
-         *
-         * @param {getDataCallback} callback - Callback that handles the API data.
+         * @async
          */
-        getData(callback) {
-            request(options, (error, response, body) => {
-                if (response.statusCode === 200) {
-                    const parsedBody = JSON.parse(body);
-                    if (parsedBody.ok) {
-                        const stations = parsedBody.stations.filter(filterStations);
+        async getData() {
+            const response = await fetch(url);
+            const parsedResponse = response.json();
 
-                        stations.forEach(normalizeStations);
 
-                        const price = stations.slice(0);
-                        price.sort(sortByPrice);
+            if (!parsedResponse.ok) {
+                throw new Error('Error no fuel data');
+            }
 
-                        callback(null, {
-                            types: ['diesel', 'e5', 'e10'],
-                            unit: 'km',
-                            currency: 'EUR',
-                            byPrice: price,
-                            byDistance: stations
-                        });
-                    } else {
-                        callback('Error no fuel data');
-                    }
-                } else {
-                    callback(`Error getting fuel data ${response.statusCode}`);
-                }
-            });
+            const stations = parsedResponse.stations.filter(filterStations);
+
+            stations.forEach(normalizeStations);
+
+            const price = stations.slice(0);
+            price.sort(sortByPrice);
+
+            return {
+                types: ['diesel', 'e5', 'e10'],
+                unit: 'km',
+                currency: 'EUR',
+                byPrice: price,
+                byDistance: stations
+            };
         }
     };
 };

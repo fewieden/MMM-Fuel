@@ -14,16 +14,22 @@
 const NodeHelper = require('node_helper');
 
 /**
- * @external fs
- * @see https://nodejs.org/api/fs.html
+ * @external fs-extra
+ * @see https://www.npmjs.com/package/fs-extra
  */
-const fs = require('fs');
+const fs = require('fs-extra');
+
+/**
+ * @external path
+ * @see https://nodejs.org/api/path.html
+ */
+const path = require('path');
 
 /**
  * @module node_helper
  * @description Backend for the module to query data from the API providers.
  *
- * @requires external:fs
+ * @requires external:fs-extra
  * @requires external:node_helper
  */
 module.exports = NodeHelper.create({
@@ -40,15 +46,16 @@ module.exports = NodeHelper.create({
     /**
      * @function socketNotificationReceived
      * @description Receives socket notifications from the module.
+     * @async
      * @override
      *
      * @param {string} notification - Notification name
      * @param {*} payload - Detailed payload of the notification.
      */
-    socketNotificationReceived(notification, payload) {
+    async socketNotificationReceived(notification, payload) {
         if (notification === 'CONFIG') {
             this.config = payload;
-            if (fs.existsSync(`modules/${this.name}/apis/${this.config.provider}.js`)) {
+            if (await fs.pathExists(path.join(__dirname, 'apis', `${this.config.provider}.js`))) {
                 // eslint-disable-next-line global-require, import/no-dynamic-require
                 this.provider = require(`./apis/${this.config.provider}`)(this.config);
                 this.getData();
@@ -64,14 +71,14 @@ module.exports = NodeHelper.create({
     /**
      * @function getData
      * @description Uses API provider to get data.
+     * @async
      */
-    getData() {
-        this.provider.getData((err, data) => {
-            if (err) {
-                console.log(err);
-            } else {
-                this.sendSocketNotification('PRICELIST', data);
-            }
-        });
+    async getData() {
+        try {
+            const data = await this.provider.getData();
+            this.sendSocketNotification('PRICELIST', data);
+        } catch (e) {
+            console.log(e);
+        }
     }
 });

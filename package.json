@@ -30,6 +30,7 @@
     "stylelint-config-standard": "^16.0.0"
   },
   "dependencies": {
-    "request": "^2.74.0"
+    "fs-extra": "^7.0.1",
+    "node-fetch": "^2.3.0"
   }
 }

@@ -25,17 +25,17 @@ To display the data of the stations in the UI, a single station has to be in the
 
 ## getData
 
-The API provider needs to implement the function `getData`, which gets a callback as parameter.
-The callback has to have the following format:
+The API provider needs to implement the async function `getData`, which gets a callback as parameter.
+The response has to have the following format:
 
 ```
-callback(null, {
+{
     types: ['diesel', 'e5', 'e10'], // Array | types supported by the API provider.
     unit: 'km', // String | unit for the distance either in kilometres (km) or miles (ml).
     currency: 'EUR', // String | curreny of the fuel prices either in EUR or USD.
     byPrice: stations, // Array | stations (see above) sorted by price.
     byDistance: distance // Array | stations (see above) sorted by distance.
-});
+};
 ```
 
-If an error occurs in the process you can return it as the first parameter of the callback.
+If an error occurs in the process you can throw an exception.

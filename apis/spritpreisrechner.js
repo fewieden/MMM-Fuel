@@ -8,16 +8,16 @@
  */
 
 /**
- * @external request
- * @see https://www.npmjs.com/package/request
+ * @external node-fetch
+ * @see https://www.npmjs.com/package/node-fetch
  */
-const request = require('request');
+const fetch = require('node-fetch');
 
 /**
  * @module apis/spritpreisrechner
  * @description Queries data from spritpreisrechner.at
  *
- * @requires external:request
+ * @requires external:node-fetch
  *
  * @param {Object} config - Configuration.
  * @param {number} config.lat - Latitude of Coordinate.
@@ -39,32 +39,30 @@ module.exports = (config) => {
     };
 
     /**
-     * @function generateOptions
-     * @description Helper function to generate API request options.
+     * @function generateUrl
+     * @description Helper function to generate API request url.
      *
      * @param {string} type - Fuel type
-     * @returns {Object} Options
+     * @returns {string} url
      */
 
-    const generateOptions = type => ({
-        url: `${baseUrl}/search/gas-stations/by-address?latitude=${config.lat}&longitude=${config.lng}&fuelType=${types[type]}&includeClosed=${!config.showOpenOnly}`
-    });
+    const generateUrl = type => `${baseUrl}/search/gas-stations/by-address?latitude=${config.lat}&longitude=${config.lng}&fuelType=${types[type]}&includeClosed=${!config.showOpenOnly}`;
 
     /**
      * @function requestFuelType
      * @description API request for specified type.
+     * @async
      *
      * @param {string} type - Fuel type.
-     * @returns {Promise} Data or error message.
+     * @returns {Promise} Object with fuel type and data.
      */
-    const requestFuelType = type => new Promise((resolve, reject) => {
-        request(generateOptions(type), (error, response, body) => {
-            if (response.statusCode === 200) {
-                resolve({ type, data: JSON.parse(body) });
-            }
-            reject(`Error getting fuel data ${response.statusCode}`);
-        });
-    });
+    const requestFuelType = async type => {
+        const response = await fetch(generateUrl(type));
+        return {
+            type,
+            data: await response.json()
+        };
+    };
 
     /**
      * @function compareStations
@@ -141,78 +139,66 @@ module.exports = (config) => {
 
     return {
         /**
-         * @callback getDataCallback
-         * @param {?string} error - Error message.
-         * @param {Object} data - API data.
-         *
-         * @see apis/README.md
-         */
-
-        /**
          * @function getData
          * @description Performs the data query and processing.
-         *
-         * @param {getDataCallback} callback - Callback that handles the API data.
+         * @async
          */
-        getData(callback) {
-            Promise
-                .all(config.types.map(requestFuelType))
-                .then((responses) => {
-                    const collection = {};
-                    responses.forEach((element) => { collection[element.type] = element.data; });
+        async getData() {
+            const responses = await Promise.all(config.types.map(requestFuelType));
+            const collection = {};
+            responses.forEach((element) => { collection[element.type] = element.data; });
 
-                    let stations = collection[config.sortBy];
+            let stations = collection[config.sortBy];
 
-                    const maxPrices = {};
-                    for (let type in collection) {
-                        for (let station of collection[type]) {
-                            for (let price of station.prices) {
-                                if (!maxPrices[price.fuelType] || price.amount > maxPrices[price.fuelType]) {
-                                    maxPrices[price.fuelType] = price.amount;
-                                }
-                            }
+            const maxPrices = {};
+            for (let type in collection) {
+                for (let station of collection[type]) {
+                    for (let price of station.prices) {
+                        if (!maxPrices[price.fuelType] || price.amount > maxPrices[price.fuelType]) {
+                            maxPrices[price.fuelType] = price.amount;
                         }
                     }
+                }
+            }
 
-                    stations = stations.filter((station) => station.distance <= config.radius);
+            stations = stations.filter((station) => station.distance <= config.radius);
 
-                    delete collection[config.sortBy];
-                    const keys = Object.keys(collection);
+            delete collection[config.sortBy];
+            const keys = Object.keys(collection);
 
-                    normalizeStations(stations, keys);
+            normalizeStations(stations, keys);
 
-                    keys.forEach((type) => {
-                        collection[type].forEach((station) => {
-                            for (let i = 0; i < stations.length; i += 1) {
-                                if (compareStations(station, stations[i])) {
-                                    stations[i].prices[type] = reducePrice(station.prices);
-                                    break;
-                                }
-                            }
-                        });
-                    });
-
-                    for (let station of stations) {
-                        for (let type in station.prices) {
-                            if (station.prices[type] === -1) {
-                                station.prices[type] = `>${maxPrices[types[type]]}`;
-                            }
+            keys.forEach((type) => {
+                collection[type].forEach((station) => {
+                    for (let i = 0; i < stations.length; i += 1) {
+                        if (compareStations(station, stations[i])) {
+                            stations[i].prices[type] = reducePrice(station.prices);
+                            break;
                         }
                     }
-
-                    stations = stations.filter(filterStations);
-
-                    const distance = stations.slice(0);
-                    distance.sort(sortByDistance);
-
-                    callback(null, {
-                        types: ['diesel', 'e5', 'gas'],
-                        unit: 'km',
-                        currency: 'EUR',
-                        byPrice: stations,
-                        byDistance: distance
-                    });
                 });
+            });
+
+            for (let station of stations) {
+                for (let type in station.prices) {
+                    if (station.prices[type] === -1) {
+                        station.prices[type] = `>${maxPrices[types[type]]}`;
+                    }
+                }
+            }
+
+            stations = stations.filter(filterStations);
+
+            const distance = stations.slice(0);
+            distance.sort(sortByDistance);
+
+            return {
+                types: ['diesel', 'e5', 'gas'],
+                unit: 'km',
+                currency: 'EUR',
+                byPrice: stations,
+                byDistance: distance
+            };
         }
     };
 };
