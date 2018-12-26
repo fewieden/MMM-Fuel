@@ -133,6 +133,33 @@ Module.register('MMM-Fuel', {
     },
 
     /**
+     * @function getTemplate
+     * @description Nunjuck template.
+     * @override
+     *
+     * @returns {string} Path to nunjuck template.
+     */
+    getTemplate() {
+        return 'templates/MMM-Fuel.njk';
+    },
+
+    /**
+     * @function getTemplateData
+     * @description Data that gets rendered in the nunjuck template.
+     * @override
+     *
+     * @returns {string} Data for the nunjuck template.
+     */
+    getTemplateData() {
+        return {
+            config: this.config,
+            priceList: this.priceList,
+            sortByPrice: this.sortByPrice,
+            gasStations: this.sortByPrice ? this.priceList.byPrice : this.priceList.byDistance
+        };
+    },
+
+    /**
      * @function start
      * @description Appends Google Map script to the body, if the config option map_api_key is defined. Calls
      * createInterval and sends the config to the node_helper.
