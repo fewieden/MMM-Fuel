@@ -5,9 +5,9 @@
   "source": {
     "include": [
       "package.json",
-      "README.md",
       "LICENSE",
-      "apis/README.md"
+      "apis/README.md",
+      "README.md"
     ],
     "exclude": [
       "node_modules"
