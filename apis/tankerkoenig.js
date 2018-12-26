@@ -111,7 +111,7 @@ module.exports = config => {
          */
         async getData() {
             const response = await fetch(url);
-            const parsedResponse = response.json();
+            const parsedResponse = await response.json();
 
 
             if (!parsedResponse.ok) {

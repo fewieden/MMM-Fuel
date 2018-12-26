@@ -157,7 +157,6 @@ Module.register('MMM-Fuel', {
             gasStations = this.sortByPrice ? this.priceList.byPrice : this.priceList.byDistance;
         }
 
-
         return {
             config: this.config,
             priceList: this.priceList,
