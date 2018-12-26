@@ -51,6 +51,8 @@ module.exports = NodeHelper.create({
      *
      * @param {string} notification - Notification name
      * @param {*} payload - Detailed payload of the notification.
+     *
+     * @returns {void}
      */
     async socketNotificationReceived(notification, payload) {
         if (notification === 'CONFIG') {
@@ -72,6 +74,8 @@ module.exports = NodeHelper.create({
      * @function getData
      * @description Uses API provider to get data.
      * @async
+     *
+     * @returns {void}
      */
     async getData() {
         try {

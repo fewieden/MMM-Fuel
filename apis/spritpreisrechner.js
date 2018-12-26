@@ -26,8 +26,10 @@ const fetch = require('node-fetch');
  * @param {string} config.sortBy - Type to sort by price.
  * @param {string[]} config.types - Requested fuel types.
  * @param {boolean} config.showOpenOnly - Flag to show only open gas stations.
+ *
+ * @returns {Object} Object with function getData.
  */
-module.exports = (config) => {
+module.exports = config => {
     /** @member {string} baseUrl - API url */
     const baseUrl = 'https://api.e-control.at/sprit/1.0';
 
@@ -46,7 +48,8 @@ module.exports = (config) => {
      * @returns {string} url
      */
 
-    const generateUrl = type => `${baseUrl}/search/gas-stations/by-address?latitude=${config.lat}&longitude=${config.lng}&fuelType=${types[type]}&includeClosed=${!config.showOpenOnly}`;
+    const generateUrl = type => `${baseUrl}/search/gas-stations/by-address?latitude=${config.lat}&longitude=${
+        config.lng}&fuelType=${types[type]}&includeClosed=${!config.showOpenOnly}`;
 
     /**
      * @function requestFuelType
@@ -70,13 +73,14 @@ module.exports = (config) => {
      *
      * @param {Object} a - Gas Station
      * @param {Object} b - Gas Station
-     * @returns {boolean}
+     *
+     * @returns {boolean} Flag if the gas stations are equal.
      */
-    const compareStations = (a, b) => a.location.city === b.location.city &&
-        a.location.postalCode === b.location.postalCode &&
-        a.name === b.name &&
-        a.location.latitude === b.location.latitude &&
-        a.location.longitude === b.location.longitude;
+    const compareStations = (a, b) => a.location.city === b.location.city
+        && a.location.postalCode === b.location.postalCode
+        && a.name === b.name
+        && a.location.latitude === b.location.latitude
+        && a.location.longitude === b.location.longitude;
 
     /**
      * @function reducePrice
@@ -97,9 +101,10 @@ module.exports = (config) => {
      * @description Helper function to filter gas stations.
      *
      * @param {Object} station - Gas Station
-     * @returns {boolean}
+     *
+     * @returns {boolean} To keep or filter the station.
      */
-    const filterStations = (station) => {
+    const filterStations = station => {
         const prices = Object.keys(station.prices);
         return !prices.every(type => station.prices[type] === -1);
     };
@@ -110,7 +115,8 @@ module.exports = (config) => {
      *
      * @param {Object} a - Gas Station
      * @param {Object} b - Gas Station
-     * @returns {number}
+     *
+     * @returns {number} Sorting weight.
      */
     const sortByDistance = (a, b) => a.distance - b.distance;
 
@@ -121,6 +127,8 @@ module.exports = (config) => {
      * @param {Object[]} stations - Gas Station.
      * @param {string[]} keys - Fuel types except config option sortBy.
      *
+     * @returns {void}
+     *
      * @see apis/README.md
      */
     const normalizeStations = (stations, keys) => {
@@ -128,7 +136,9 @@ module.exports = (config) => {
             /* eslint-disable no-param-reassign */
             stations[index].name = value.name;
             stations[index].prices = { [config.sortBy]: reducePrice(value.prices) };
-            keys.forEach((type) => { stations[index].prices[type] = -1; });
+            keys.forEach(type => {
+                stations[index].prices[type] = -1;
+            });
             stations[index].isOpen = value.open;
             stations[index].address = `${value.location.postalCode} ${value.location.city} - ${value.location.address}`;
             stations[index].lat = parseFloat(value.location.latitude);
@@ -142,18 +152,24 @@ module.exports = (config) => {
          * @function getData
          * @description Performs the data query and processing.
          * @async
+         *
+         * @returns {Object} Returns object described in the provider documentation.
+         *
+         * @see apis
          */
         async getData() {
             const responses = await Promise.all(config.types.map(requestFuelType));
             const collection = {};
-            responses.forEach((element) => { collection[element.type] = element.data; });
+            responses.forEach(element => {
+                collection[element.type] = element.data;
+            });
 
             let stations = collection[config.sortBy];
 
             const maxPrices = {};
-            for (let type in collection) {
-                for (let station of collection[type]) {
-                    for (let price of station.prices) {
+            for (const type in collection) {
+                for (const station of collection[type]) {
+                    for (const price of station.prices) {
                         if (!maxPrices[price.fuelType] || price.amount > maxPrices[price.fuelType]) {
                             maxPrices[price.fuelType] = price.amount;
                         }
@@ -161,15 +177,15 @@ module.exports = (config) => {
                 }
             }
 
-            stations = stations.filter((station) => station.distance <= config.radius);
+            stations = stations.filter(station => station.distance <= config.radius);
 
             delete collection[config.sortBy];
             const keys = Object.keys(collection);
 
             normalizeStations(stations, keys);
 
-            keys.forEach((type) => {
-                collection[type].forEach((station) => {
+            keys.forEach(type => {
+                collection[type].forEach(station => {
                     for (let i = 0; i < stations.length; i += 1) {
                         if (compareStations(station, stations[i])) {
                             stations[i].prices[type] = reducePrice(station.prices);
@@ -179,8 +195,8 @@ module.exports = (config) => {
                 });
             });
 
-            for (let station of stations) {
-                for (let type in station.prices) {
+            for (const station of stations) {
+                for (const type in station.prices) {
                     if (station.prices[type] === -1) {
                         station.prices[type] = `>${maxPrices[types[type]]}`;
                     }

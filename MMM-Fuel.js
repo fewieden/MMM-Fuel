@@ -224,13 +224,15 @@ Module.register('MMM-Fuel', {
      * @description Checks for voice commands.
      *
      * @param {string} data - Text with commands.
+     *
+     * @returns {void}
      */
     checkCommands(data) {
         if (/(HELP)/g.test(data)) {
-            if (/(CLOSE)/g.test(data) || (this.help && !/(OPEN)/g.test(data))) {
+            if (/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)) {
                 this.help = false;
                 this.interval = this.createInterval();
-            } else if (/(OPEN)/g.test(data) || (!this.help && !/(CLOSE)/g.test(data))) {
+            } else if (/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)) {
                 this.map = false;
                 this.help = true;
                 clearInterval(this.interval);
@@ -261,6 +263,8 @@ Module.register('MMM-Fuel', {
     /**
      * @function addGlobals
      * @description Adds custom globals used by the nunjuck template.
+     *
+     * @returns {void}
      */
     addGlobals() {
         this.nunjucksEnvironment().addGlobal('includes', (array, item) => array.includes(item));
@@ -269,11 +273,13 @@ Module.register('MMM-Fuel', {
     /**
      * @function addFilters
      * @description Adds custom filters used by the nunjuck template.
+     *
+     * @returns {void}
      */
     addFilters() {
         this.nunjucksEnvironment().addFilter('capitalizeFirstLetter', text => this.capitalizeFirstLetter(text));
         this.nunjucksEnvironment().addFilter('shortenText', text => this.shortenText(text));
-        this.nunjucksEnvironment().addFilter('formatPrice', (price) => {
+        this.nunjucksEnvironment().addFilter('formatPrice', price => {
             if (price === -1) {
                 return '-';
             }

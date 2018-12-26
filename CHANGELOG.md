@@ -13,6 +13,7 @@
 * fs-extra for promised based filesystem access.
 * Replaced request with node-fetch.
 * Documentation is now hosted on github pages instead of doclets.io (unmaintained).
+* eslint recommended instead of airbnb ruleset.
 
 ### Removed
 

@@ -11,7 +11,7 @@
  * Earth radius in meter.
  * @type {number}
  */
-const earth = 6371e3;
+const EARTH = 6371e3;
 
 /**
  * @function deg2rad
@@ -43,7 +43,8 @@ module.exports = {
      *
      * @param {number} lat - Latitude of a Coordinate
      * @param {number} lng - Longitude of a Coordinate
-     * @returns {module:Coordinate}
+     *
+     * @returns {module:Coordinate} Returns itself.
      */
     from(lat, lng) {
         this.lat = lat;
@@ -57,6 +58,7 @@ module.exports = {
      *
      * @param {number} degree - Direction to the target (North is 0).
      * @param {number} distance - Distance in kilometres to the target.
+     *
      * @returns {Object.<string, number>} Target Coordinate.
      *
      * @throws {Error} Error gets thrown if the start Coordinate wasn't set.
@@ -73,7 +75,7 @@ module.exports = {
 
         const radius = distance * 1000;
 
-        const δ = Math.sqrt(2 * (radius * radius)) / earth;
+        const δ = Math.sqrt(2 * (radius * radius)) / EARTH;
         const θ = deg2rad(Number(degree));
 
         const sinφ1 = Math.sin(φ1);
@@ -83,12 +85,15 @@ module.exports = {
         const sinθ = Math.sin(θ);
         const cosθ = Math.cos(θ);
 
-        const sinφ2 = (sinφ1 * cosδ) + (cosφ1 * sinδ * cosθ);
+        const sinφ2 = sinφ1 * cosδ + cosφ1 * sinδ * cosθ;
         const φ2 = Math.asin(sinφ2);
         const y = sinθ * sinδ * cosφ1;
-        const x = cosδ - (sinφ1 * sinφ2);
+        const x = cosδ - sinφ1 * sinφ2;
         const λ2 = λ1 + Math.atan2(y, x);
 
-        return { lat: rad2deg(φ2), lng: ((rad2deg(λ2) + 540) % 360) - 180 };
+        return {
+            lat: rad2deg(φ2),
+            lng: (rad2deg(λ2) + 540) % 360 - 180
+        };
     }
 };

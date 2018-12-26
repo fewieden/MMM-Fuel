@@ -27,15 +27,17 @@ const fetch = require('node-fetch');
  * @param {string[]} config.types - Requested fuel types.
  * @param {boolean} config.showOpenOnly - Flag to show only open gas stations.
  *
+ * @returns {Object} Object with function getData.
+ *
  * @see https://creativecommons.tankerkoenig.de/
  */
-module.exports = (config) => {
+module.exports = config => {
     /** @member {string} baseUrl - API url */
     const baseUrl = 'https://creativecommons.tankerkoenig.de/json/list.php';
 
     /** @member {string} url - API url combined with config options. */
     const url = `${baseUrl}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
-            config.api_key}&sort=dist`;
+        config.api_key}&sort=dist`;
 
     /**
      * @function sortByPrice
@@ -43,7 +45,8 @@ module.exports = (config) => {
      *
      * @param {Object} a - Gas Station
      * @param {Object} b - Gas Station
-     * @returns {number}
+     *
+     * @returns {number} Sorting weight.
      */
     const sortByPrice = (a, b) => {
         if (b[config.sortBy] === 0) {
@@ -59,11 +62,12 @@ module.exports = (config) => {
      * @description Helper function to filter gas stations.
      *
      * @param {Object} station - Gas Station
-     * @returns {boolean}
+     *
+     * @returns {boolean} To keep or filter the station.
      */
-    const filterStations = (station) => {
+    const filterStations = station => {
         for (let i = 0; i < config.types.length; i += 1) {
-            if (station[config.types[i]] <= 0 || (config.showOpenOnly && !station.isOpen)) {
+            if (station[config.types[i]] <= 0 || config.showOpenOnly && !station.isOpen) {
                 return false;
             }
         }
@@ -78,6 +82,8 @@ module.exports = (config) => {
      * @param {int} index - Array index
      * @param {Object[]} stations - Original Array.
      *
+     * @returns {void}
+     *
      * @see apis/README.md
      */
     const normalizeStations = (value, index, stations) => {
@@ -88,7 +94,7 @@ module.exports = (config) => {
             e10: value.e10
         };
         stations[index].distance = value.dist;
-        stations[index].address = `${(`0${value.postCode}`).slice(-5)} ${
+        stations[index].address = `${`0${value.postCode}`.slice(-5)} ${
             value.place} - ${value.street} ${value.houseNumber}`;
         /* eslint-enable no-param-reassign */
     };
@@ -98,6 +104,10 @@ module.exports = (config) => {
          * @function getData
          * @description Performs the data query and processing.
          * @async
+         *
+         * @returns {Object} Returns object described in the provider documentation.
+         *
+         * @see apis
          */
         async getData() {
             const response = await fetch(url);
