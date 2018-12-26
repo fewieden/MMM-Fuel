@@ -5,7 +5,9 @@
   "source": {
     "include": [
       "package.json",
-      "README.md"
+      "README.md",
+      "LICENSE",
+      "apis/README.md"
     ],
     "exclude": [
       "node_modules"
@@ -15,5 +17,4 @@
     "destination": "docs",
     "recurse": true
   }
-
 }

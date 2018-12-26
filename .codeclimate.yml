@@ -5,7 +5,7 @@ engines:
     enabled: true
     config:
       languages:
-      - javascript
+        - javascript
   eslint:
     enabled: true
     channel: "eslint-3"
@@ -18,9 +18,8 @@ engines:
     enabled: true
 ratings:
   paths:
-  - "**.css"
-  - "**.js"
-  - "**.md"
-exclude_paths: [
-  "node_modules/**/*"
-]
+    - "**.css"
+    - "**.js"
+    - "**.md"
+exclude_paths:
+  - "node_modules/**/*"
