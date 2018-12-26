@@ -151,11 +151,18 @@ Module.register('MMM-Fuel', {
      * @returns {string} Data for the nunjuck template.
      */
     getTemplateData() {
+        let gasStations;
+
+        if (this.priceList) {
+            gasStations = this.sortByPrice ? this.priceList.byPrice : this.priceList.byDistance;
+        }
+
+
         return {
             config: this.config,
             priceList: this.priceList,
             sortByPrice: this.sortByPrice,
-            gasStations: this.sortByPrice ? this.priceList.byPrice : this.priceList.byDistance
+            gasStations
         };
     },
 
