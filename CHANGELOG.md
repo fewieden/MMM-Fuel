@@ -2,12 +2,21 @@
 
 ## [2.0.0]
 
+### Added
+
+* Nunjuck templates
+
 ### Changed
 
 * Config files
 * async/await on the node side of the module.
 * fs-extra for promised based filesystem access.
-* replace request with node-fetch.
+* Replaced request with node-fetch.
+
+### Removed
+
+* Distance conversion
+* Modals (help, map)
 
 ## [1.1.1]
 
