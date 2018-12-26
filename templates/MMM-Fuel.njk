@@ -44,7 +44,7 @@
                         <td class="centered">{{ gasStation.prices[type] | formatPrice }}</td>
                     {% endif %}
                 {% endfor %}
-                <td class="centered">{{ UNIT }}</td>
+                <td class="centered">{{ gasStation.distance }} {{ priceList.unit }}</td>
                 {% if config.open %}
                     <td class="centered">
                         <i class="fa fa-{{ "unlock" if gasStation.isOpen else "lock" }}"></i>
