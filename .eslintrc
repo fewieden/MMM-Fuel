@@ -1,7 +1,7 @@
 {
     "extends": ["esnext", "esnext/style-guide", "node", "node/style-guide"],
     "parserOptions": {
-        "ecmaVersion": 6,
+        "ecmaVersion": 2017,
         "sourceType": "module"
     },
     "settings": {
