@@ -85,7 +85,8 @@ No API key required.
 
 ### nsw (Australia NSW only)
 
-No API key required.
+This provider gives no information if the gas stations are open or closed.
+Config options should be set accordingly `open`: false and `showOpenOnly`: false.
 
 | **Option** | **Default** | **Description** |
 | --- | --- | --- |
