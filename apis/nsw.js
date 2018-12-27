@@ -30,6 +30,7 @@ const QUARTER_DAY = 6 * HOUR;
  * @async
  *
  * @requires external:node-fetch
+ * @requires external:moment
  *
  * @param {Object} config - Configuration.
  * @param {number} config.lat - Latitude of Coordinate.
@@ -62,10 +63,16 @@ module.exports = async config => {
             const response = await fetch(`${baseUrl}/oauth/client_credential/accesstoken?grant_type=client_credentials`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${Buffer.from(`${config.api_key}:${config.secret}`).toString('base64')}`
+                    authorization: `Basic ${Buffer.from(`${config.api_key}:${config.secret}`).toString('base64')}`,
+                    'User-Agent': 'MagicMirror²'
                 }
             });
             const parsedResponse = await response.json();
+
+            if (parsedResponse.Error) {
+                throw new Error(parsedResponse.Error);
+            }
+
             token = parsedResponse.access_token;
         } catch (e) {
             console.log('MMM-Fuel: Failed to refresh token', e);
@@ -218,7 +225,7 @@ module.exports = async config => {
             for (const station of stations) {
                 for (const type in station.prices) {
                     if (station.prices[type] === -1) {
-                        station.prices[type] = `>${maxPrices[types[type]]}`;
+                        station.prices[type] = `>${maxPrices[type]}`;
                     }
                 }
             }
