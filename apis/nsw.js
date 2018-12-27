@@ -1,5 +1,5 @@
 /**
- * @file apis/spritpreisrechner.js
+ * @file apis/nsw.js
  *
  * @author fewieden
  * @license MIT
@@ -14,8 +14,20 @@
 const fetch = require('node-fetch');
 
 /**
- * @module apis/spritpreisrechner
- * @description Queries data from spritpreisrechner.at
+ * @external moment
+ * @see https://www.npmjs.com/package/moment
+ */
+const moment = require('moment');
+
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const QUARTER_DAY = 6 * HOUR;
+
+/**
+ * @module apis/nsw
+ * @description Queries data from https://api.nsw.gov.au
+ * @async
  *
  * @requires external:node-fetch
  *
@@ -29,27 +41,38 @@ const fetch = require('node-fetch');
  *
  * @returns {Object} Object with function getData.
  */
-module.exports = config => {
+module.exports = async config => {
     /** @member {string} baseUrl - API url */
-    const baseUrl = 'https://api.e-control.at/sprit/1.0';
+    const baseUrl = 'https://api.onegov.nsw.gov.au';
+
+    /** @member {number} transaction - unique transaction id */
+    let transaction = 1;
 
     /** @member {Object} types - Mapping of fuel types to API fuel types. */
     const types = {
-        diesel: 'DIE',
-        e5: 'SUP',
-        gas: 'GAS'
+        diesel: 'DL',
+        e5: 'P95'
     };
 
-    /**
-     * @function generateUrl
-     * @description Helper function to generate API request url.
-     *
-     * @param {string} type - Fuel type
-     * @returns {string} url
-     */
+    /** @member {string|undefined} token - authorization token */
+    let token;
 
-    const generateUrl = type => `${baseUrl}/search/gas-stations/by-address?latitude=${config.lat}&longitude=${
-        config.lng}&fuelType=${types[type]}&includeClosed=${!config.showOpenOnly}`;
+    async function refreshToken() {
+        try {
+            const response = await fetch(`${baseUrl}/oauth/client_credential/accesstoken?grant_type=client_credentials`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${btoa(`${config.api_key}:${config.secret}`)}`
+                }
+            });
+            const parsedResponse = await response.json();
+            token = parsedResponse.access_token;
+        } catch (e) {
+            console.log('MMM-Fuel: Failed to refresh token', e);
+        }
+    }
+
+    setInterval(refreshToken, QUARTER_DAY);
 
     /**
      * @function requestFuelType
@@ -60,41 +83,30 @@ module.exports = config => {
      * @returns {Promise} Object with fuel type and data.
      */
     const requestFuelType = async type => {
-        const response = await fetch(generateUrl(type));
+        const response = await fetch(`${baseUrl}/FuelPriceCheck/v1/fuel/prices/nearby`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                apikey: config.api_key,
+                Authorization: `Bearer ${token}`,
+                transactionid: transaction++,
+                requesttimestamp: moment().utc()
+                    .format('DD/MM/YYYY hh:mm:ss A')
+            },
+            body: JSON.stringify({
+                fueltype: types[type],
+                latitude: config.lat,
+                longitude: config.lng,
+                radius: config.radius,
+                sortby: 'price',
+                sortascending: true
+            })
+        });
         return {
             type,
             data: await response.json()
         };
     };
-
-    /**
-     * @function compareStations
-     * @description Helper function to compare gas stations.
-     *
-     * @param {Object} a - Gas Station
-     * @param {Object} b - Gas Station
-     *
-     * @returns {boolean} Flag if the gas stations are equal.
-     */
-    const compareStations = (a, b) => a.location.city === b.location.city
-        && a.location.postalCode === b.location.postalCode
-        && a.name === b.name
-        && a.location.latitude === b.location.latitude
-        && a.location.longitude === b.location.longitude;
-
-    /**
-     * @function reducePrice
-     * @description Reduces array of prices to single price.
-     *
-     * @param {Object[]} prices - All prices.
-     * @returns {number} Highest price or -1 if there is no price.
-     */
-    const reducePrice = prices => prices.reduce((current, price) => {
-        if (!Object.prototype.hasOwnProperty.call(price, 'amount') || price.amount === '') {
-            return current;
-        }
-        return current < price.amount ? price.amount : current;
-    }, -1);
 
     /**
      * @function filterStations
@@ -134,18 +146,28 @@ module.exports = config => {
     const normalizeStations = (stations, keys) => {
         stations.forEach((value, index) => {
             /* eslint-disable no-param-reassign */
-            stations[index].name = value.name;
-            stations[index].prices = { [config.sortBy]: reducePrice(value.prices) };
+            stations[index].prices = { [config.sortBy]: value.price };
             keys.forEach(type => {
                 stations[index].prices[type] = -1;
             });
-            stations[index].isOpen = value.open;
-            stations[index].address = `${value.location.postalCode} ${value.location.city} - ${value.location.address}`;
-            stations[index].lat = parseFloat(value.location.latitude);
-            stations[index].lng = parseFloat(value.location.longitude);
-            stations[index].distance = value.distance.toFixed(2);
+            stations[index].lat = value.location.latitude;
+            stations[index].lng = value.location.longitude;
+            stations[index].distance = value.location.distance;
             /* eslint-enable no-param-reassign */
         });
+    };
+
+    const mapPriceToStation = ({ stations, prices }) => {
+        for (const station of stations) {
+            for (const price of prices) {
+                if (station.code === price.stationcode) {
+                    station.price = price.price;
+                    break;
+                }
+            }
+        }
+
+        return stations;
     };
 
     return {
@@ -161,24 +183,20 @@ module.exports = config => {
         async getData() {
             const responses = await Promise.all(config.types.map(requestFuelType));
             const collection = {};
-            responses.forEach(element => {
-                collection[element.type] = element.data;
-            });
+            for (const response of responses) {
+                collection[response.type] = mapPriceToStation(response.data);
+            }
 
             let stations = collection[config.sortBy];
 
             const maxPrices = {};
             for (const type in collection) {
                 for (const station of collection[type]) {
-                    for (const price of station.prices) {
-                        if (!maxPrices[price.fuelType] || price.amount > maxPrices[price.fuelType]) {
-                            maxPrices[price.fuelType] = price.amount;
-                        }
+                    if (!maxPrices[type] || station.price > maxPrices[type]) {
+                        maxPrices[type] = station.price;
                     }
                 }
             }
-
-            stations = stations.filter(station => station.distance <= config.radius);
 
             delete collection[config.sortBy];
             const keys = Object.keys(collection);
@@ -188,8 +206,8 @@ module.exports = config => {
             keys.forEach(type => {
                 collection[type].forEach(station => {
                     for (let i = 0; i < stations.length; i += 1) {
-                        if (compareStations(station, stations[i])) {
-                            stations[i].prices[type] = reducePrice(station.prices);
+                        if (station.code === stations[i].code) {
+                            stations[i].prices[type] = station.price;
                             break;
                         }
                     }
@@ -210,9 +228,9 @@ module.exports = config => {
             distance.sort(sortByDistance);
 
             return {
-                types: ['diesel', 'e5', 'gas'],
+                types: ['diesel', 'e5'],
                 unit: 'km',
-                currency: 'EUR',
+                currency: 'AUD',
                 byPrice: stations,
                 byDistance: distance
             };

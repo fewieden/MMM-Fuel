@@ -36,6 +36,7 @@ Module.register('MMM-Fuel', {
 
     /** @member {Object} currencies - Is used to convert currencies into symbols. */
     currencies: {
+        AUD: '$',
         EUR: '€'
     },
 
