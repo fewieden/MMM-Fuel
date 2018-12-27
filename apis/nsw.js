@@ -62,7 +62,7 @@ module.exports = async config => {
             const response = await fetch(`${baseUrl}/oauth/client_credential/accesstoken?grant_type=client_credentials`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${btoa(`${config.api_key}:${config.secret}`)}`
+                    Authorization: `Bearer ${Buffer.from(`${config.api_key}:${config.secret}`).toString('base64')}`
                 }
             });
             const parsedResponse = await response.json();
