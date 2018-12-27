@@ -72,6 +72,7 @@ module.exports = async config => {
         }
     }
 
+    await refreshToken();
     setInterval(refreshToken, QUARTER_DAY);
 
     /**
