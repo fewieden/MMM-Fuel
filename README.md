@@ -83,6 +83,18 @@ No API key required.
 | `radius` | `5` | Valid range not tested yet. |
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
 
+### nsw (Australia NSW only)
+
+This provider gives no information if the gas stations are open or closed.
+Config options should be set accordingly `open`: false and `showOpenOnly`: false.
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `api_key` | REQUIRED | Get an API key for free access to the data of [api.nsw](https://api.nsw.gov.au/). |
+| `secret` | REQUIRED | You also need to add the secret visible in your dashboard on [api.nsw](https://api.nsw.gov.au/). |
+| `types` | `["diesel"]` | Valid options are `diesel`, `e5`. |
+| `radius` | `5` | Valid range not tested yet. |
+
 ## OPTIONAL: Voice Control
 
 This module supports voice control by [MMM-voice](https://github.com/fewieden/MMM-voice). In order to use this feature, it's required to install the voice module. There are no extra config options for voice control needed.

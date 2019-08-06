@@ -59,7 +59,7 @@ module.exports = NodeHelper.create({
             this.config = payload;
             if (await fs.pathExists(path.join(__dirname, 'apis', `${this.config.provider}.js`))) {
                 // eslint-disable-next-line global-require, import/no-dynamic-require
-                this.provider = require(`./apis/${this.config.provider}`)(this.config);
+                this.provider = await require(`./apis/${this.config.provider}`)(this.config);
                 this.getData();
                 setInterval(() => {
                     this.getData();
