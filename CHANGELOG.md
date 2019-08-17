@@ -1,5 +1,26 @@
 # MMM-Fuel Changelog
 
+## [2.0.0]
+
+### Added
+
+* Nunjuck templates
+* Provider for NSW Australia
+
+### Changed
+
+* Config files
+* async/await on the node side of the module.
+* fs-extra for promised based filesystem access.
+* Replaced request with node-fetch.
+* eslint recommended instead of airbnb ruleset.
+
+### Removed
+
+* Documentation on doclets.io (unmaintained).
+* Distance conversion
+* Modals (help, map)
+
 ## [1.1.1]
 
 ### Added

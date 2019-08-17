@@ -1,4 +1,4 @@
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/fewieden/MMM-Fuel/master/LICENSE) [![Build Status](https://travis-ci.org/fewieden/MMM-Fuel.svg?branch=master)](https://travis-ci.org/fewieden/MMM-Fuel) [![Code Climate](https://codeclimate.com/github/fewieden/MMM-Fuel/badges/gpa.svg?style=flat)](https://codeclimate.com/github/fewieden/MMM-Fuel) [![Known Vulnerabilities](https://snyk.io/test/github/fewieden/mmm-fuel/badge.svg)](https://snyk.io/test/github/fewieden/mmm-fuel) [![API Doc](https://doclets.io/fewieden/MMM-Fuel/master.svg)](https://doclets.io/fewieden/MMM-Fuel/master)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/fewieden/MMM-Fuel/master/LICENSE) [![Build Status](https://travis-ci.org/fewieden/MMM-Fuel.svg?branch=master)](https://travis-ci.org/fewieden/MMM-Fuel) [![Code Climate](https://codeclimate.com/github/fewieden/MMM-Fuel/badges/gpa.svg?style=flat)](https://codeclimate.com/github/fewieden/MMM-Fuel) [![Known Vulnerabilities](https://snyk.io/test/github/fewieden/mmm-fuel/badge.svg)](https://snyk.io/test/github/fewieden/mmm-fuel)
 
 # MMM-Fuel
 
@@ -13,7 +13,8 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
 * OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice)
 * npm
-* [request](https://www.npmjs.com/package/request)
+* [fs-extra](https://www.npmjs.com/package/fs-extra)
+* [node-fetch](https://www.npmjs.com/package/node-fetch)
 
 ## Installation
 
@@ -34,7 +35,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
     }
     ```
 
-1. Run command `npm install --productive` in `~/MagicMirror/modules/MMM-Fuel` directory.
+1. Run command `npm i --production` in `~/MagicMirror/modules/MMM-Fuel` directory.
 
 ## Config Options
 
@@ -82,6 +83,18 @@ No API key required.
 | `radius` | `5` | Valid range not tested yet. |
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
 
+### nsw (Australia NSW only)
+
+This provider gives no information if the gas stations are open or closed.
+Config options should be set accordingly `open`: false and `showOpenOnly`: false.
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `api_key` | REQUIRED | Get an API key for free access to the data of [api.nsw](https://api.nsw.gov.au/). |
+| `secret` | REQUIRED | You also need to add the secret visible in your dashboard on [api.nsw](https://api.nsw.gov.au/). |
+| `types` | `["diesel"]` | Valid options are `diesel`, `e5`. |
+| `radius` | `5` | Valid range not tested yet. |
+
 ## OPTIONAL: Voice Control
 
 This module supports voice control by [MMM-voice](https://github.com/fewieden/MMM-voice). In order to use this feature, it's required to install the voice module. There are no extra config options for voice control needed.
@@ -101,10 +114,6 @@ The voice control mode for this module is `FUEL`
 
 * `npm run lint` - Lints JS and CSS files.
 * `npm run docs` - Generates documentation.
-
-### Documentation
-
-The documentation can be found [here](https://doclets.io/fewieden/MMM-Fuel/master)
 
 ### API Provider Development
 

@@ -1,0 +1,63 @@
+<header class="align-left">
+    {% if config.iconHeader %}
+        <i class="fa fa-car logo"></i>
+    {% endif %}
+    <span>{{'FUEL_PRICES' | translate}}</span>
+</header>
+{% if not priceList %}
+    <div class="dimmed light">{{'LOADING' | translate}}</div>
+{% else %}
+    <table class="small table align-left">
+        <tr>
+            <th>
+                {% if sortByPrice %}
+                    {{'CHEAPEST_STATIONS' | translate}}
+                {% else %}
+                    {{'CLOSEST_STATIONS' | translate}}
+                {% endif %}
+            </th>
+            {% for type in config.types %}
+                {% if includes(priceList.types, type)  %}
+                    <th class="centered">
+                        <span>{{ type | capitalizeFirstLetter }}</span>
+                        {% if sortByPrice and config.sortBy == type %}
+                            <i class="fa fa-long-arrow-down sortBy"></i>
+                        {% endif %}
+                    </th>
+                {% endif %}
+            {% endfor %}
+            <th class="centered">
+                <i class="fa fa-map-o"></i>
+                {% if not sortByPrice %}
+                    <i class="fa fa-long-arrow-down sortBy"></i>
+                {% endif %}
+            </th>
+            {% if config.open %}
+                <th class="centered"><i class="fa fa-clock-o"></i></th>
+            {% endif %}
+        </tr>
+        {% for gasStation in gasStations %}
+            <tr>
+                <td>{{ gasStation.name | shortenText }}</td>
+                {% for type in config.types %}
+                    {% if includes(priceList.types, type)  %}
+                        <td class="centered">{{ gasStation.prices[type] | formatPrice }}</td>
+                    {% endif %}
+                {% endfor %}
+                <td class="centered">{{ gasStation.distance }} {{ priceList.unit }}</td>
+                {% if config.open %}
+                    <td class="centered">
+                        <i class="fa fa-{{ "unlock" if gasStation.isOpen else "lock" }}"></i>
+                    </td>
+                {% endif %}
+            </tr>
+            {% if config.showAddress %}
+                <tr>
+                    <td colspan="{{ 2 + config.types.length + (1 if config.open else 0) }}" class="xsmall">
+                        {{ gasStation.address | shortenText }}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+{% endif %}

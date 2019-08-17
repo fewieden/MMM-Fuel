@@ -7,7 +7,7 @@
  * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* global Module Log config google */
+/* global Module Log */
 
 /**
  * @external Module
@@ -36,6 +36,7 @@ Module.register('MMM-Fuel', {
 
     /** @member {Object} currencies - Is used to convert currencies into symbols. */
     currencies: {
+        AUD: '$',
         EUR: '€'
     },
 
@@ -133,6 +134,40 @@ Module.register('MMM-Fuel', {
     },
 
     /**
+     * @function getTemplate
+     * @description Nunjuck template.
+     * @override
+     *
+     * @returns {string} Path to nunjuck template.
+     */
+    getTemplate() {
+        return 'templates/MMM-Fuel.njk';
+    },
+
+    /**
+     * @function getTemplateData
+     * @description Data that gets rendered in the nunjuck template.
+     * @override
+     *
+     * @returns {string} Data for the nunjuck template.
+     */
+    getTemplateData() {
+        let gasStations;
+
+        if (this.priceList) {
+            gasStations = this.sortByPrice ? this.priceList.byPrice : this.priceList.byDistance;
+            gasStations = gasStations.slice(0, Math.min(gasStations.length, this.config.max));
+        }
+
+        return {
+            config: this.config,
+            priceList: this.priceList,
+            sortByPrice: this.sortByPrice,
+            gasStations
+        };
+    },
+
+    /**
      * @function start
      * @description Appends Google Map script to the body, if the config option map_api_key is defined. Calls
      * createInterval and sends the config to the node_helper.
@@ -140,6 +175,8 @@ Module.register('MMM-Fuel', {
      */
     start() {
         Log.info(`Starting module: ${this.name}`);
+        this.addGlobals();
+        this.addFilters();
         // Add script manually, getScripts doesn't work for it!
         if (this.config.map_api_key) {
             const script = document.createElement('script');
@@ -202,161 +239,6 @@ Module.register('MMM-Fuel', {
     },
 
     /**
-     * @function getDom
-     * @description Creates the UI as DOM for displaying in MagicMirror application.
-     * @override
-     *
-     * @returns {Element}
-     */
-    getDom() {
-        const wrapper = document.createElement('div');
-        const list = document.createElement('div');
-        const header = document.createElement('header');
-        header.classList.add('align-left');
-        if (this.config.iconHeader) {
-            const logo = document.createElement('i');
-            logo.classList.add('fa', 'fa-car', 'logo');
-            header.appendChild(logo);
-        }
-        const name = document.createElement('span');
-        name.innerHTML = this.translate('FUEL_PRICES');
-        header.appendChild(name);
-        list.appendChild(header);
-
-        if (!this.priceList) {
-            const text = document.createElement('div');
-            text.innerHTML = this.translate('LOADING');
-            text.classList.add('dimmed', 'light');
-            list.appendChild(text);
-        } else {
-            const table = document.createElement('table');
-            table.classList.add('small', 'table', 'align-left');
-
-            table.appendChild(this.createLabelRow());
-
-            const data = this.sortByPrice ? this.priceList.byPrice : this.priceList.byDistance;
-
-            for (let i = 0; i < Math.min(data.length, this.config.max); i += 1) {
-                this.appendDataRow(data[i], table);
-            }
-
-            list.appendChild(table);
-
-            const modules = document.querySelectorAll('.module');
-            for (let i = 0; i < modules.length; i += 1) {
-                if (!modules[i].classList.contains('MMM-Fuel')) {
-                    if (this.map || this.help) {
-                        modules[i].classList.add('MMM-Fuel-blur');
-                    } else {
-                        modules[i].classList.remove('MMM-Fuel-blur');
-                    }
-                }
-            }
-
-            if (this.map || this.help) {
-                list.classList.add('MMM-Fuel-blur');
-                const modal = document.createElement('div');
-                modal.classList.add('modal');
-                if (this.map && this.config.map_api_key) {
-                    if (typeof google === 'object' && typeof google.maps === 'object') {
-                        if (!this.config.colored) {
-                            modal.classList.add('no-color');
-                        }
-                        const map = document.createElement('div');
-                        map.classList.add('MMM-Fuel-map');
-                        map.style.height = `${this.config.height}px`;
-                        map.style.width = `${this.config.width}px`;
-                        modal.appendChild(map);
-                        const script = document.createElement('script');
-                        script.innerHTML = `var MMM_Fuel_map = \
-                            new google.maps.Map(document.querySelector('div.MMM-Fuel-map'), \
-                            {center: new google.maps.LatLng(${this.config.lat}, \
-                            ${this.config.lng}), zoom: ${this.config.zoom}, disableDefaultUI:true});
-                            var trafficLayer = new google.maps.TrafficLayer();
-                            trafficLayer.setMap(MMM_Fuel_map);
-                            var MMM_Fuel_array = ${JSON.stringify(this.priceList.byPrice)};
-                            for(let i = 0; i < MMM_Fuel_array.length; i += 1){
-                            var marker = new google.maps.Marker({ position: {lat: MMM_Fuel_array[i].lat, \
-                            lng: MMM_Fuel_array[i].lng}, label: i + 1 + '', map: MMM_Fuel_map});
-                            }`;
-                        modal.appendChild(script);
-                    } else {
-                        modal.innerHTML = this.translate('MAP_API_NOT_READY');
-                    }
-                } else if (this.map) {
-                    modal.innerHTML = this.translate('API_KEY_NEEDED');
-                } else {
-                    this.appendHelp(modal);
-                }
-                wrapper.appendChild(modal);
-            }
-        }
-
-        wrapper.appendChild(list);
-
-        return wrapper;
-    },
-
-    /**
-     * @function createLabelRow
-     * @description Creates label row for price table.
-     *
-     * @returns {Element}
-     */
-    createLabelRow() {
-        const labelRow = document.createElement('tr');
-
-        const sortLabel = document.createElement('th');
-        if (this.sortByPrice) {
-            sortLabel.innerHTML = this.translate('CHEAPEST_STATIONS');
-        } else {
-            sortLabel.innerHTML = this.translate('CLOSEST_STATIONS');
-        }
-        labelRow.appendChild(sortLabel);
-
-        for (let i = 0; i < this.config.types.length; i += 1) {
-            if (this.priceList.types.includes(this.config.types[i])) {
-                const typeLabel = document.createElement('th');
-                typeLabel.classList.add('centered');
-
-                const typeSpan = document.createElement('span');
-                typeSpan.innerHTML = this.capitalizeFirstLetter(this.config.types[i]);
-                typeLabel.appendChild(typeSpan);
-
-                if (this.sortByPrice && this.config.sortBy === this.config.types[i]) {
-                    typeLabel.appendChild(this.createSortIcon());
-                }
-
-                labelRow.appendChild(typeLabel);
-            }
-        }
-
-        const distanceIconLabel = document.createElement('th');
-        distanceIconLabel.classList.add('centered');
-
-        const distanceIcon = document.createElement('i');
-        distanceIcon.classList.add('fa', 'fa-map-o');
-        distanceIconLabel.appendChild(distanceIcon);
-
-        if (!this.sortByPrice) {
-            distanceIconLabel.appendChild(this.createSortIcon());
-        }
-
-        labelRow.appendChild(distanceIconLabel);
-
-        if (this.config.open) {
-            const openCloseIconLabel = document.createElement('th');
-            openCloseIconLabel.classList.add('centered');
-            const openCloseIcon = document.createElement('i');
-            openCloseIcon.classList.add('fa', 'fa-clock-o');
-            openCloseIconLabel.appendChild(openCloseIcon);
-            labelRow.appendChild(openCloseIconLabel);
-        }
-
-        return labelRow;
-    },
-
-    /**
      * @function shortenText
      * @description Shortens text based on config option (shortenText) and adds ellipsis at the end.
      *
@@ -373,106 +255,19 @@ Module.register('MMM-Fuel', {
     },
 
     /**
-     * @function appendDataRow
-     * @description Creates the UI for the station price table.
-     *
-     * @param {Object} data - Information about a station.
-     * @param {string} data.name - The gas station name.
-     * @param {Object.<string, number>} data.prices - Prices (value) of the different fuel types (key).
-     * @param {number} data.distance - Distance between user location and gas station.
-     * @param {boolean} data.isOpen - Indicator if the gas station is currently open or closed.
-     * @param {string} data.address - Address of the gas station in the format: Postcode City - Street Housenumber.
-     * @param {Element} appendTo - DOM Element where the UI gets appended as child.
-     *
-     * @example <caption>data object</caption>
-     * {
-     *   "name": "Aral Tankstelle",
-     *   "prices": {
-     *     "diesel": 1.009,
-     *     "e5": 1.009,
-     *     "e10": 1.009
-     *   },
-     *   "distance": 2.2,
-     *   "isOpen": true,
-     *   "address": "70372 Stuttgart - Waiblinger Straße 23-25",
-     *   "lat": 48.8043442,
-     *   "lng": 9.220273
-     * }
-     */
-    appendDataRow(data, appendTo) {
-        const row = document.createElement('tr');
-
-        const name = document.createElement('td');
-        name.innerHTML = this.shortenText(data.name);
-        row.appendChild(name);
-
-        for (let i = 0; i < this.config.types.length; i += 1) {
-            if (this.priceList.types.includes(this.config.types[i])) {
-                const price = document.createElement('td');
-                price.classList.add('centered');
-                if (data.prices[this.config.types[i]] === -1) {
-                    price.innerHTML = '-';
-                } else {
-                    price.innerHTML = `${this.config.toFixed ?
-                        data.prices[this.config.types[i]].toFixed(2) : data.prices[this.config.types[i]]} ${
-                        this.currencies[this.priceList.currency]}`;
-                }
-                row.appendChild(price);
-            }
-        }
-
-        const distanceUnit = this.units[config.units];
-        let distance = data.distance;
-
-        if (distanceUnit !== this.priceList.unit) {
-            distance = this[`${this.priceList.unit}2${distanceUnit}`](distance);
-        }
-
-        const distanceColumn = document.createElement('td');
-        distanceColumn.classList.add('centered');
-        distanceColumn.innerHTML = `${distance.toFixed(2)} ${distanceUnit}`;
-        row.appendChild(distanceColumn);
-
-        if (this.config.open) {
-            const lockUnlockIconLabel = document.createElement('td');
-            lockUnlockIconLabel.classList.add('centered');
-            const lockUnlockIcon = document.createElement('i');
-            if (data.isOpen) {
-                lockUnlockIcon.classList.add('fa', 'fa-unlock');
-            } else {
-                lockUnlockIcon.classList.add('fa', 'fa-lock');
-            }
-            lockUnlockIconLabel.appendChild(lockUnlockIcon);
-            row.appendChild(lockUnlockIconLabel);
-        }
-
-        appendTo.appendChild(row);
-
-        if (this.config.showAddress) {
-            const details = document.createElement('tr');
-            details.setAttribute('colspan', 2 + this.config.types.length + (this.config.open ? 1 : 0));
-
-            const address = document.createElement('td');
-            address.classList.add('xsmall');
-            address.innerHTML = this.shortenText(data.address);
-            details.appendChild(address);
-
-            appendTo.appendChild(details);
-        }
-    },
-
-    /**
      * @function checkCommands
      * @description Checks for voice commands.
      *
      * @param {string} data - Text with commands.
+     *
+     * @returns {void}
      */
     checkCommands(data) {
         if (/(HELP)/g.test(data)) {
-            if (/(CLOSE)/g.test(data) || (this.help && !/(OPEN)/g.test(data))) {
+            if (/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)) {
                 this.help = false;
                 this.interval = this.createInterval();
-            } else if (/(OPEN)/g.test(data) || (!this.help && !/(CLOSE)/g.test(data))) {
+            } else if (/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)) {
                 this.map = false;
                 this.help = true;
                 clearInterval(this.interval);
@@ -489,48 +284,6 @@ Module.register('MMM-Fuel', {
     },
 
     /**
-     * @function appendHelp
-     * @description Creates the UI for the voice command SHOW HELP.
-     *
-     * @param {Element} appendTo - DOM Element where the UI gets appended as child.
-     */
-    appendHelp(appendTo) {
-        const title = document.createElement('h1');
-        title.classList.add('medium');
-        title.innerHTML = `${this.name} - ${this.translate('COMMAND_LIST')}`;
-        appendTo.appendChild(title);
-
-        const mode = document.createElement('div');
-        mode.innerHTML = `${this.translate('MODE')}: ${this.voice.mode}`;
-        appendTo.appendChild(mode);
-
-        const listLabel = document.createElement('div');
-        listLabel.innerHTML = `${this.translate('VOICE_COMMANDS')}:`;
-        appendTo.appendChild(listLabel);
-
-        const list = document.createElement('ul');
-        for (let i = 0; i < this.voice.sentences.length; i += 1) {
-            const item = document.createElement('li');
-            item.innerHTML = this.voice.sentences[i];
-            list.appendChild(item);
-        }
-        appendTo.appendChild(list);
-    },
-
-    /**
-     * @function createSortIcon
-     * @description Creates a DOM Element with the FontAwesome icon
-     * fa-long-arrow-down {@link http://fontawesome.io/icons/}.
-     *
-     * @returns {Element} Element with icon.
-     */
-    createSortIcon() {
-        const sortIcon = document.createElement('i');
-        sortIcon.classList.add('fa', 'fa-long-arrow-down', 'sortBy');
-        return sortIcon;
-    },
-
-    /**
      * @function capitalizeFirstLetter
      * @description Capitalizes the first character in a string.
      *
@@ -543,26 +296,30 @@ Module.register('MMM-Fuel', {
     },
 
     /**
-     * @function km2ml
-     * @description Converts the unit kilometres to miles.
+     * @function addGlobals
+     * @description Adds custom globals used by the nunjuck template.
      *
-     * @param {number} value - Distance in kilometres.
-     *
-     * @returns {number} Distance in miles.
+     * @returns {void}
      */
-    km2ml(value) {
-        return value * 0.62137;
+    addGlobals() {
+        this.nunjucksEnvironment().addGlobal('includes', (array, item) => array.includes(item));
     },
 
     /**
-     * @function ml2km
-     * @description Converts the unit miles to kilometres.
+     * @function addFilters
+     * @description Adds custom filters used by the nunjuck template.
      *
-     * @param {number} value - Distance in miles.
-     *
-     * @returns {number} Distance in kilometres.
+     * @returns {void}
      */
-    ml2km(value) {
-        return value * 1.60934;
+    addFilters() {
+        this.nunjucksEnvironment().addFilter('capitalizeFirstLetter', text => this.capitalizeFirstLetter(text));
+        this.nunjucksEnvironment().addFilter('shortenText', text => this.shortenText(text));
+        this.nunjucksEnvironment().addFilter('formatPrice', price => {
+            if (price === -1) {
+                return '-';
+            }
+
+            return `${this.config.toFixed ? price.toFixed(2) : price} ${this.currencies[this.priceList.currency]}`;
+        });
     }
 });
