@@ -1,5 +1,11 @@
 # MMM-Fuel Changelog
 
+## [2.0.1]
+
+### Fixed
+
+* Rendering of ellipsis with config `shortenText` active https://github.com/fewieden/MMM-Fuel/issues/36
+
 ## [2.0.0]
 
 ### Added
