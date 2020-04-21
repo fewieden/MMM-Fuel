@@ -1,0 +1,11 @@
+{
+  "LOADING": "Chargement...",
+  "FUEL_PRICES": "Prix du carburant",
+  "CHEAPEST_STATIONS": "Stations d'essence les moins chères",
+  "CLOSEST_STATIONS": "Stations-service les plus proches",
+  "COMMAND_LIST": "Liste de toutes les commandes vocales",
+  "MODE": "Mode",
+  "VOICE_COMMANDS": "Commandes Vocales",
+  "API_KEY_NEEDED": "Vous devez ajouter une clé API afin de visualiser les stations-service sur une carte.",
+  "MAP_API_NOT_READY": "L'API de carte n'est pas encore disponible. Réessayez plus tard."
+}
