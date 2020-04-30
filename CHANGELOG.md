@@ -1,10 +1,25 @@
 # MMM-Fuel Changelog
 
+## [2.0.2]
+
+### Added
+
+* French Translations
+* Clarification for config option `updateInterval` in readme
+
+### Changed
+
+* Dependency Update
+
+### Removed
+
+* Github pages
+
 ## [2.0.1]
 
 ### Fixed
 
-* Rendering of ellipsis with config `shortenText` active https://github.com/fewieden/MMM-Fuel/issues/36
+* [Rendering of ellipsis with config `shortenText` active]( https://github.com/fewieden/MMM-Fuel/issues/36)
 
 ## [2.0.0]
 

@@ -38,4 +38,7 @@ function sortByDistance(a, b) {
  * @module apis/utils
  * @description Utility functions for API integrations.
  */
-module.exports = { filterStations, sortByDistance };
+module.exports = {
+    filterStations,
+    sortByDistance
+};
