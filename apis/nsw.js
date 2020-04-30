@@ -40,7 +40,9 @@ let token;
  * @description Helper function to refresh the API token.
  * @async
  *
- * @returns {Promise}
+ * @param {object} config - Config object with authentication details.
+ *
+ * @returns {Promise} This async function just returns a promise but no value.
  *
  * @see apis/README.md
  */
@@ -160,7 +162,10 @@ async function requestFuelType(type) {
         })
     });
 
-    return { type, data: await response.json() };
+    return {
+        type,
+        data: await response.json()
+    };
 }
 
 /**

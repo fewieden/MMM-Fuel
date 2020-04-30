@@ -18,24 +18,24 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 
 ## Installation
 
-1. Clone this repo into `~/MagicMirror/modules` directory.
-1. Configure your `~/MagicMirror/config/config.js`:
+* Clone this repo into `~/MagicMirror/modules` directory.
+* Configure your `~/MagicMirror/config/config.js`:
 
-    ```
-    {
-        module: "MMM-Fuel",
-        position: "top_right",
-        config: {
-            api_key: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-            lat: 52.518611,
-            lng: 13.408333,
-            types: ["diesel"],
-            ...
-        }
+```js
+{
+    module: "MMM-Fuel",
+    position: "top_right",
+    config: {
+        api_key: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        lat: 52.518611,
+        lng: 13.408333,
+        types: ["diesel"],
+        ...
     }
-    ```
+}
+```
 
-1. Run command `npm i --production` in `~/MagicMirror/modules/MMM-Fuel` directory.
+* Run command `npm i --production` in `~/MagicMirror/modules/MMM-Fuel` directory.
 
 ## Config Options
 
@@ -60,7 +60,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `iconHeader` | `true` | Boolean to display the car icon in the header. |
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
-| `updateInterval` | `900000` (15 mins) | How often should the data be fetched. |
+| `updateInterval` | `900000` (15 mins) | How often should the data be fetched. **If your value is to small, you risk to get banned from the API provider. I suggest a minimum of 15mins** |
 
 ### tankerkoenig (Germany only)
 
