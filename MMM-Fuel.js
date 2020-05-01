@@ -42,10 +42,6 @@ Module.register('MMM-Fuel', {
 
     /** @member {boolean} sortByPrice - Flag to switch between sorting (price and distance). */
     sortByPrice: true,
-    /** @member {boolean} help - Flag to switch between render help or not. */
-    help: false,
-    /** @member {boolean} map - Flag to switch between render map or not. */
-    map: false,
     /** @member {?Interval} interval - Toggles sortByPrice */
     interval: null,
 
@@ -218,9 +214,7 @@ Module.register('MMM-Fuel', {
         } else if (notification === 'VOICE_FUEL' && sender.name === 'MMM-voice') {
             this.checkCommands(payload);
         } else if (notification === 'VOICE_MODE_CHANGED' && sender.name === 'MMM-voice' && payload.old === this.voice.mode) {
-            this.help = false;
-            this.map = false;
-            this.updateDom(300);
+            this.sendNotification('CLOSE_MODAL');
         }
     },
 
@@ -264,24 +258,29 @@ Module.register('MMM-Fuel', {
      * @returns {void}
      */
     checkCommands(data) {
+        console.log('command', data);
         if (/(HELP)/g.test(data)) {
-            if (/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)) {
-                this.help = false;
-                this.interval = this.createInterval();
-            } else if (/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)) {
-                this.map = false;
-                this.help = true;
-                clearInterval(this.interval);
+            if (/(CLOSE)/g.test(data) && !/(OPEN)/g.test(data)) {
+                this.sendNotification('CLOSE_MODAL');
+            } else if (/(OPEN)/g.test(data) && !/(CLOSE)/g.test(data)) {
+                console.log('sending modal notification');
+                this.sendNotification('OPEN_MODAL', {
+                    template: 'templates/HelpModal.njk',
+                    data: this.voice
+                });
             }
         } else if (/(HIDE)/g.test(data) && /(MAP)/g.test(data)) {
-            this.map = false;
-            this.interval = this.createInterval();
+            this.sendNotification('CLOSE_MODAL');
         } else if (/(GAS)/g.test(data) && /(STATIONS)/g.test(data)) {
-            this.help = false;
-            this.map = true;
-            clearInterval(this.interval);
+            this.sendNotification('OPEN_MODAL', {
+                template: 'templates/MapModal.njk',
+                data: {
+                    config: this.config,
+                    priceList: JSON.stringify(this.priceList.byPrice),
+                    translate: this.translate.bind(this)
+                }
+            });
         }
-        this.updateDom(300);
     },
 
     /**

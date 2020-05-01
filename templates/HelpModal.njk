@@ -1,0 +1,8 @@
+<h1 class="medium">MMM-Fuel</h1>
+<div>{{'MODE' | translate}}: {{data.mode}}</div>
+<div>{{'VOICE_COMMANDS' | translate}}:</div>
+<ul class="help">
+    {% for sentence in data.sentences %}
+        <li>{{sentence}}</li>
+    {% endfor %}
+</ul>
