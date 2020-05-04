@@ -7,7 +7,7 @@
  * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* global Module Log */
+/* global Module Log google */
 
 /**
  * @external Module
@@ -20,11 +20,17 @@
  */
 
 /**
+ * @external google
+ * @see https://maps.googleapis.com/maps/api/js
+ */
+
+/**
  * @module MMM-Fuel
  * @description Frontend for the module to display data.
  *
  * @requires external:Module
  * @requires external:Log
+ * @requires external:google
  */
 Module.register('MMM-Fuel', {
 
@@ -307,7 +313,7 @@ Module.register('MMM-Fuel', {
 
         const center = new google.maps.LatLng(this.config.lat, this.config.lng);
         const zoom = this.config.zoom;
-        this.map = new google.maps.Map(mapContainer, {center, zoom, disableDefaultUI:true});
+        this.map = new google.maps.Map(mapContainer, { center, zoom, disableDefaultUI: true });
 
         this.trafficLayer = new google.maps.TrafficLayer();
         this.trafficLayer.setMap(this.map);
@@ -315,9 +321,9 @@ Module.register('MMM-Fuel', {
         const list = this.priceList.byPrice;
         this.markers = [];
 
-        for (let i = 0; i < list.length; i += 1){
+        for (let i = 0; i < list.length; i += 1) {
             this.markers.push(new google.maps.Marker({
-                position: {lat: list[i].lat, lng: list[i].lng},
+                position: { lat: list[i].lat, lng: list[i].lng },
                 label: i + 1 + '',
                 map: this.map
             }));
@@ -332,7 +338,7 @@ Module.register('MMM-Fuel', {
         this.trafficLayer.setMap(null);
         this.trafficLayer = null;
 
-        for (let i = 0; i < this.markers.length; i += 1){
+        for (let i = 0; i < this.markers.length; i += 1) {
             this.markers[1].setMap(null);
         }
 
