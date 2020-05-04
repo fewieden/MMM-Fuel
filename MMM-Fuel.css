@@ -15,28 +15,7 @@
     text-align: center;
 }
 
-.MMM-Fuel-blur {
-    -webkit-filter: blur(2px) brightness(50%);
-    filter: blur(2px) brightness(50%);
-}
-
-.MMM-Fuel .modal {
-    position: fixed;
-    z-index: 9000;
-    text-align: left;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    -o-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-}
-
-.MMM-Fuel .modal ul {
-    margin: 0;
-}
-
-.MMM-Fuel .no-color {
+.no-color .MMM-Fuel-map {
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
 }

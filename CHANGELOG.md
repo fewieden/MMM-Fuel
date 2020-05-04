@@ -1,5 +1,11 @@
 # MMM-Fuel Changelog
 
+## [2.1.0]
+
+### Changed
+
+* Using [MMM-Modal](https://github.com/fewieden/MMM-Modal) to display modals like gas station and voice commands.
+
 ## [2.0.2]
 
 ### Added

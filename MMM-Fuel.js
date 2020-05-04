@@ -7,7 +7,7 @@
  * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* global Module Log */
+/* global Module Log google */
 
 /**
  * @external Module
@@ -20,11 +20,17 @@
  */
 
 /**
+ * @external google
+ * @see https://maps.googleapis.com/maps/api/js
+ */
+
+/**
  * @module MMM-Fuel
  * @description Frontend for the module to display data.
  *
  * @requires external:Module
  * @requires external:Log
+ * @requires external:google
  */
 Module.register('MMM-Fuel', {
 
@@ -42,10 +48,6 @@ Module.register('MMM-Fuel', {
 
     /** @member {boolean} sortByPrice - Flag to switch between sorting (price and distance). */
     sortByPrice: true,
-    /** @member {boolean} help - Flag to switch between render help or not. */
-    help: false,
-    /** @member {boolean} map - Flag to switch between render map or not. */
-    map: false,
     /** @member {?Interval} interval - Toggles sortByPrice */
     interval: null,
 
@@ -218,9 +220,9 @@ Module.register('MMM-Fuel', {
         } else if (notification === 'VOICE_FUEL' && sender.name === 'MMM-voice') {
             this.checkCommands(payload);
         } else if (notification === 'VOICE_MODE_CHANGED' && sender.name === 'MMM-voice' && payload.old === this.voice.mode) {
-            this.help = false;
-            this.map = false;
-            this.updateDom(300);
+            this.sendNotification('CLOSE_MODAL');
+        } else if (notification === 'MODAL_CLOSED' && payload.identifier === this.identifier) {
+            this.deinitMap();
         }
     },
 
@@ -264,24 +266,85 @@ Module.register('MMM-Fuel', {
      * @returns {void}
      */
     checkCommands(data) {
+        console.log('command', data);
         if (/(HELP)/g.test(data)) {
-            if (/(CLOSE)/g.test(data) || this.help && !/(OPEN)/g.test(data)) {
-                this.help = false;
-                this.interval = this.createInterval();
-            } else if (/(OPEN)/g.test(data) || !this.help && !/(CLOSE)/g.test(data)) {
-                this.map = false;
-                this.help = true;
-                clearInterval(this.interval);
+            if (/(CLOSE)/g.test(data) && !/(OPEN)/g.test(data)) {
+                this.sendNotification('CLOSE_MODAL');
+            } else if (/(OPEN)/g.test(data) && !/(CLOSE)/g.test(data)) {
+                console.log('sending modal notification');
+                this.sendNotification('OPEN_MODAL', {
+                    template: 'templates/HelpModal.njk',
+                    data: {
+                        ...this.voice,
+                        fns: {
+                            translate: this.translate.bind(this)
+                        }
+                    }
+                });
             }
         } else if (/(HIDE)/g.test(data) && /(MAP)/g.test(data)) {
-            this.map = false;
-            this.interval = this.createInterval();
+            this.sendNotification('CLOSE_MODAL');
         } else if (/(GAS)/g.test(data) && /(STATIONS)/g.test(data)) {
-            this.help = false;
-            this.map = true;
-            clearInterval(this.interval);
+            this.sendNotification('OPEN_MODAL', {
+                template: 'templates/MapModal.njk',
+                data: {
+                    config: this.config,
+                    fns: {
+                        translate: this.translate.bind(this)
+                    }
+                },
+                options: {
+                    callback: this.initMap.bind(this)
+                }
+            });
         }
-        this.updateDom(300);
+    },
+
+    initMap(success) {
+        if (!success || this.map) {
+            return;
+        }
+
+        const mapContainer = document.querySelector('div.MMM-Fuel-map');
+
+        if (!mapContainer) {
+            return;
+        }
+
+        const center = new google.maps.LatLng(this.config.lat, this.config.lng);
+        const zoom = this.config.zoom;
+        this.map = new google.maps.Map(mapContainer, { center, zoom, disableDefaultUI: true });
+
+        this.trafficLayer = new google.maps.TrafficLayer();
+        this.trafficLayer.setMap(this.map);
+
+        const list = this.priceList.byPrice;
+        this.markers = [];
+
+        for (let i = 0; i < list.length; i += 1) {
+            this.markers.push(new google.maps.Marker({
+                position: { lat: list[i].lat, lng: list[i].lng },
+                label: i + 1 + '',
+                map: this.map
+            }));
+        }
+    },
+
+    deinitMap() {
+        if (!this.map) {
+            return;
+        }
+
+        this.trafficLayer.setMap(null);
+        this.trafficLayer = null;
+
+        for (let i = 0; i < this.markers.length; i += 1) {
+            this.markers[1].setMap(null);
+        }
+
+        this.markers = [];
+
+        this.map = null;
     },
 
     /**

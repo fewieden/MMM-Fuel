@@ -6,12 +6,12 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 
 ## Examples
 
-![](.github/example.jpg) ![](.github/example2.jpg) ![](.github/example3.jpg)
+![](.github/example.jpg) ![](.github/example2.jpg) ![](.github/example3.png)
 
 ## Dependencies
 
 * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
-* OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice)
+* OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice) and [MMM-Modal](https://github.com/fewieden/MMM-Modal)
 * npm
 * [fs-extra](https://www.npmjs.com/package/fs-extra)
 * [node-fetch](https://www.npmjs.com/package/node-fetch)
@@ -30,7 +30,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
         lat: 52.518611,
         lng: 13.408333,
         types: ["diesel"],
-        ...
+        // all your config options, which are different than their default values
     }
 }
 ```
@@ -95,9 +95,10 @@ Config options should be set accordingly `open`: false and `showOpenOnly`: false
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5`. |
 | `radius` | `5` | Valid range not tested yet. |
 
-## OPTIONAL: Voice Control
+## OPTIONAL: Voice Control and Modal
 
-This module supports voice control by [MMM-voice](https://github.com/fewieden/MMM-voice). In order to use this feature, it's required to install the voice module. There are no extra config options for voice control needed.
+This module supports voice control by [MMM-voice](https://github.com/fewieden/MMM-voice) and [MMM-Modal](https://github.com/fewieden/MMM-Modal).
+In order to use this feature, it's required to install the voice and modal modules. There are no extra config options for voice control and modals needed.
 
 ### Mode
 

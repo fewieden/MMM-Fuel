@@ -1,0 +1,7 @@
+<div {% if not data.config.colored %}class="no-color"{% endif %}>
+    {% if not data.config.map_api_key %}
+        {{ data.fns.translate('API_KEY_NEEDED') }}
+    {% else %}
+        <div class="MMM-Fuel-map" style="height: {{ data.config.height }}px; width: {{ data.config.width }}px;"></div>
+    {% endif %}
+</div>

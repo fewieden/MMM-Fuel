@@ -1,6 +1,6 @@
 {
   "name": "mmm-fuel",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Gas Station price Module for MagicMirror2",
   "scripts": {
     "lint": "./node_modules/.bin/eslint . && ./node_modules/.bin/stylelint **/*.css",
