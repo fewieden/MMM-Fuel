@@ -1,27 +1,7 @@
 <div {% if not data.config.colored %}class="no-color"{% endif %}>
     {% if not data.config.map_api_key %}
-        {{ data.translate('API_KEY_NEEDED') }}
+        {{ data.fns.translate('API_KEY_NEEDED') }}
     {% else %}
         <div class="MMM-Fuel-map" style="height: {{ data.config.height }}px; width: {{ data.config.width }}px;"></div>
-        <script>
-            console.log('inside the modal template');
-
-            var center = new google.maps.LatLng({{ data.config.lat }}, {{ data.config.lng }});
-            var zoom = {{ data.config.zoom }};
-            var MMM_Fuel_map = new google.maps.Map(document.querySelector('div.MMM-Fuel-map'), {center, zoom, disableDefaultUI:true});
-
-            var trafficLayer = new google.maps.TrafficLayer();
-            trafficLayer.setMap(MMM_Fuel_map);
-
-            var MMM_Fuel_array = {{ data.priceList | safe}};
-
-            for (var i = 0; i < MMM_Fuel_array.length; i += 1){
-                var marker = new google.maps.Marker({
-                    position: {lat: MMM_Fuel_array[i].lat, lng: MMM_Fuel_array[i].lng},
-                    label: i + 1 + '',
-                    map: MMM_Fuel_map
-                });
-            }
-        </script>
     {% endif %}
 </div>
