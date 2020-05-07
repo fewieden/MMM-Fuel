@@ -178,6 +178,12 @@ Module.register('MMM-Fuel', {
      */
     start() {
         Log.info(`Starting module: ${this.name}`);
+
+        if (!this.config.types.includes(this.config.sortBy)) {
+            Log.error('Config option sortBy has no matching value in config option types! Falling back to first entry.');
+            this.config.sortBy = this.config.types[0];
+        }
+
         this.addGlobals();
         this.addFilters();
         // Add script manually, getScripts doesn't work for it!
@@ -266,12 +272,10 @@ Module.register('MMM-Fuel', {
      * @returns {void}
      */
     checkCommands(data) {
-        console.log('command', data);
         if (/(HELP)/g.test(data)) {
             if (/(CLOSE)/g.test(data) && !/(OPEN)/g.test(data)) {
                 this.sendNotification('CLOSE_MODAL');
             } else if (/(OPEN)/g.test(data) && !/(CLOSE)/g.test(data)) {
-                console.log('sending modal notification');
                 this.sendNotification('OPEN_MODAL', {
                     template: 'templates/HelpModal.njk',
                     data: {
