@@ -1,5 +1,11 @@
 # MMM-Fuel Changelog
 
+## [2.1.1]
+
+### Fixed
+
+* Wrong value in config option `sortBy` no longer keeps module in state loading forever.
+
 ## [2.1.0]
 
 ### Changed
