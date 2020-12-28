@@ -1,5 +1,19 @@
 # MMM-Fuel Changelog
 
+## [2.1.2]
+
+### Added
+
+* Missing jsdoc documentation
+
+### Changed
+
+* Dependency update
+
+### Fixed
+
+* Deinit map had a harcoded index for markers.
+
 ## [2.1.1]
 
 ### Fixed

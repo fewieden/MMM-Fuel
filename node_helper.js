@@ -38,6 +38,8 @@ module.exports = NodeHelper.create({
      * @function start
      * @description Logs a start message to the console.
      * @override
+     *
+     * @returns {void}
      */
     start() {
         console.log(`Starting module helper: ${this.name}`);
