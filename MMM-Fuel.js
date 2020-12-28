@@ -63,6 +63,7 @@ Module.register('MMM-Fuel', {
      * @property {boolean|int} shortenText - Max characters to be shown for name and address.
      * @property {boolean} showAddress - Flag to show the gas stations address.
      * @property {boolean} showOpenOnly - Flag to show only open gas stations or all.
+     * @property {boolean} showDistance - Flag to show the distance to your specified position.
      * @property {boolean} iconHeader - Flag to display the car icon in the header.
      * @property {boolean} rotate - Flag to enable/disable rotation between sort by price and distance.
      * @property {string[]} types - Fuel types to show.
@@ -84,6 +85,7 @@ Module.register('MMM-Fuel', {
         shortenText: false,
         showAddress: true,
         showOpenOnly: false,
+	    showDistance: true,
         iconHeader: true,
         rotate: true,
         types: ['diesel'],
