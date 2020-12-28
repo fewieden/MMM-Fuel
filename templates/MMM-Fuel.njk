@@ -26,12 +26,14 @@
                     </th>
                 {% endif %}
             {% endfor %}
-            <th class="centered">
-                <i class="fa fa-map-o"></i>
-                {% if not sortByPrice %}
-                    <i class="fa fa-long-arrow-down sortBy"></i>
-                {% endif %}
-            </th>
+            {% if config.showDistance %}
+                <th class="centered">
+                    <i class="fa fa-map-o"></i>
+                    {% if not sortByPrice %}
+                        <i class="fa fa-long-arrow-down sortBy"></i>
+                    {% endif %}
+                </th>
+            {% endif %}
             {% if config.open %}
                 <th class="centered"><i class="fa fa-clock-o"></i></th>
             {% endif %}
@@ -44,7 +46,9 @@
                         <td class="centered">{{ gasStation.prices[type] | formatPrice }}</td>
                     {% endif %}
                 {% endfor %}
-                <td class="centered">{{ gasStation.distance }} {{ priceList.unit }}</td>
+                {% if config.showDistance %}
+                    <td class="centered">{{ gasStation.distance }} {{ priceList.unit }}</td>
+                {% endif %}
                 {% if config.open %}
                     <td class="centered">
                         <i class="fa fa-{{ "unlock" if gasStation.isOpen else "lock" }}"></i>
@@ -53,7 +57,7 @@
             </tr>
             {% if config.showAddress %}
                 <tr>
-                    <td colspan="{{ 2 + config.types.length + (1 if config.open else 0) }}" class="xsmall">
+                    <td colspan="{{ 1 + config.types.length + (1 if config.showDistance else 0) + (1 if config.open else 0) }}" class="xsmall">
                         {{ gasStation.address | shortenText | safe }}
                     </td>
                 </tr>

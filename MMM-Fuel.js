@@ -7,7 +7,7 @@
  * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* global Module Log google */
+/* global google */
 
 /**
  * @external Module
@@ -33,7 +33,6 @@
  * @requires external:google
  */
 Module.register('MMM-Fuel', {
-
     /** @member {Object} units - Is used to determine the unit symbol of the global config option units. */
     units: {
         imperial: 'ml',
@@ -64,6 +63,7 @@ Module.register('MMM-Fuel', {
      * @property {boolean|int} shortenText - Max characters to be shown for name and address.
      * @property {boolean} showAddress - Flag to show the gas stations address.
      * @property {boolean} showOpenOnly - Flag to show only open gas stations or all.
+     * @property {boolean} showDistance - Flag to show the distance to your specified position.
      * @property {boolean} iconHeader - Flag to display the car icon in the header.
      * @property {boolean} rotate - Flag to enable/disable rotation between sort by price and distance.
      * @property {string[]} types - Fuel types to show.
@@ -85,6 +85,7 @@ Module.register('MMM-Fuel', {
         shortenText: false,
         showAddress: true,
         showOpenOnly: false,
+        showDistance: true,
         iconHeader: true,
         rotate: true,
         types: ['diesel'],
@@ -152,7 +153,7 @@ Module.register('MMM-Fuel', {
      * @description Data that gets rendered in the nunjuck template.
      * @override
      *
-     * @returns {string} Data for the nunjuck template.
+     * @returns {Object} Data for the nunjuck template.
      */
     getTemplateData() {
         let gasStations;
@@ -175,6 +176,8 @@ Module.register('MMM-Fuel', {
      * @description Appends Google Map script to the body, if the config option map_api_key is defined. Calls
      * createInterval and sends the config to the node_helper.
      * @override
+     *
+     * @returns {void}
      */
     start() {
         Log.info(`Starting module: ${this.name}`);
@@ -182,6 +185,11 @@ Module.register('MMM-Fuel', {
         if (!this.config.types.includes(this.config.sortBy)) {
             Log.error('Config option sortBy has no matching value in config option types! Falling back to first entry.');
             this.config.sortBy = this.config.types[0];
+        }
+
+        if (this.config.rotate && !this.config.showDistance) {
+            Log.error('Config option rotate does not work if distance is hidden! Falling back to no rotation.');
+            this.config.rotate = false;
         }
 
         this.addGlobals();
@@ -199,6 +207,7 @@ Module.register('MMM-Fuel', {
     /**
      * @function createInterval
      * @description Creates an interval if config option rotate is set.
+     *
      * @returns {?Interval} The Interval toggles sortByPrice between true and false.
      */
     createInterval() {
@@ -304,6 +313,14 @@ Module.register('MMM-Fuel', {
         }
     },
 
+    /**
+     * @function initMap
+     * @description Initializes the map, markers and layers.
+     *
+     * @param {boolean} success - Only initialize the map if success is truthy.
+     *
+     * @returns {void}
+     */
     initMap(success) {
         if (!success || this.map) {
             return;
@@ -334,6 +351,12 @@ Module.register('MMM-Fuel', {
         }
     },
 
+    /**
+     * @function deinitMap
+     * @description Deinitializes the map, markers and layers.
+     *
+     * @returns {void}
+     */
     deinitMap() {
         if (!this.map) {
             return;
@@ -343,7 +366,7 @@ Module.register('MMM-Fuel', {
         this.trafficLayer = null;
 
         for (let i = 0; i < this.markers.length; i += 1) {
-            this.markers[1].setMap(null);
+            this.markers[i].setMap(null);
         }
 
         this.markers = [];

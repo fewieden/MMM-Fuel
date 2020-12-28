@@ -1,5 +1,20 @@
 # MMM-Fuel Changelog
 
+## [2.1.2]
+
+### Added
+
+* Config option `showDistance` https://github.com/fewieden/MMM-Fuel/pull/49
+* Missing jsdoc documentation
+
+### Changed
+
+* Dependency update
+
+### Fixed
+
+* Deinit map had a harcoded index for markers.
+
 ## [2.1.1]
 
 ### Fixed

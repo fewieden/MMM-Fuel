@@ -57,6 +57,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `shortenText` | `false` | Integer of characters to be shown for name and address. Default shows all. |
 | `showAddress` | `true` | Boolean to show the gas stations address. |
 | `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
+| `showDistance` | `true` | Boolean to show the distance to your specified position. |
 | `iconHeader` | `true` | Boolean to display the car icon in the header. |
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
@@ -79,6 +80,7 @@ No API key required.
 
 | **Option** | **Default** | **Description** |
 | --- | --- | --- |
+| `provider` | `"tankerkoenig"` | Make sure you set it to `"spritpreisrechner"`. |
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `gas`. |
 | `radius` | `5` | Valid range not tested yet. |
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
@@ -91,6 +93,7 @@ Config options should be set accordingly `open`: false and `showOpenOnly`: false
 | **Option** | **Default** | **Description** |
 | --- | --- | --- |
 | `api_key` | REQUIRED | Get an API key for free access to the data of [api.nsw](https://api.nsw.gov.au/). |
+| `provider` | `"tankerkoenig"` | Make sure you set it to `"nsw"`. |
 | `secret` | REQUIRED | You also need to add the secret visible in your dashboard on [api.nsw](https://api.nsw.gov.au/). |
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5`. |
 | `radius` | `5` | Valid range not tested yet. |
