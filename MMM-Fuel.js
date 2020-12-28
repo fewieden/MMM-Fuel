@@ -85,7 +85,7 @@ Module.register('MMM-Fuel', {
         shortenText: false,
         showAddress: true,
         showOpenOnly: false,
-	    showDistance: true,
+        showDistance: true,
         iconHeader: true,
         rotate: true,
         types: ['diesel'],

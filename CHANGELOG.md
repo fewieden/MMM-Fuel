@@ -4,6 +4,7 @@
 
 ### Added
 
+* Config option `showDistance` https://github.com/fewieden/MMM-Fuel/pull/49
 * Missing jsdoc documentation
 
 ### Changed
