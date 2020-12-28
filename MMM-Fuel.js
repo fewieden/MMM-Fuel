@@ -187,6 +187,11 @@ Module.register('MMM-Fuel', {
             this.config.sortBy = this.config.types[0];
         }
 
+        if (this.config.rotate && !this.config.showDistance) {
+            Log.error('Config option rotate does not work if distance is hidden! Falling back to no rotation.');
+            this.config.rotate = false;
+        }
+
         this.addGlobals();
         this.addFilters();
         // Add script manually, getScripts doesn't work for it!
