@@ -62,6 +62,8 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
 | `updateInterval` | `900000` (15 mins) | How often should the data be fetched. **If your value is to small, you risk to get banned from the API provider. I suggest a minimum of 15mins** |
+| `decimalSeparator` | `.` | Decimal separator for numbers. |
+| `superscriptNine` | `false` | Display the last nine after decimal seperator as superscript nine. |
 
 ### tankerkoenig (Germany only)
 

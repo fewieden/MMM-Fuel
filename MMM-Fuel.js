@@ -72,6 +72,8 @@ Module.register('MMM-Fuel', {
      * @property {int} updateInterval - Speed of update.
      * @property {string} provider - API provider of the data.
      * @property {boolean} toFixed - Flag to show price with only 2 decimals.
+	 * @property {string} decimalSeparator - decimal separator for numbers.
+	 * @property {boolean} superscriptNine - display the last nine after decimal seperator as superscript nine.
      */
     defaults: {
         radius: 5,
@@ -93,7 +95,9 @@ Module.register('MMM-Fuel', {
         rotateInterval: 60 * 1000, // every minute
         updateInterval: 15 * 60 * 1000, // every 15 minutes
         provider: 'tankerkoenig',
-        toFixed: false
+        toFixed: false,
+        decimalSeparator: '.',
+        superscriptNine: false,
     },
 
     /**
@@ -411,6 +415,27 @@ Module.register('MMM-Fuel', {
             }
 
             return `${this.config.toFixed ? price.toFixed(2) : price} ${this.currencies[this.priceList.currency]}`;
+        });
+        this.nunjucksEnvironment().addFilter('decimalSeparator', text => {
+
+            let temp = text.toString();
+
+            if (this.config.decimalSeparator !== '.') {
+                temp = `${temp.replace(/\./g, this.config.decimalSeparator)}`;
+            }
+            return temp;
+        });
+        this.nunjucksEnvironment().addFilter('superscriptNine', price => {
+
+            let temp = price.toString();
+
+            const lastChar = temp.substr(temp.length - 1)
+
+            if (this.config.superscriptNine && !this.config.toFixed && lastChar === '9') {
+
+                temp = `${temp.slice(0, -1)}&#8313;`;
+            }
+            return temp;
         });
     }
 });
