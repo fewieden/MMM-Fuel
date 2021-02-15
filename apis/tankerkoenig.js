@@ -13,19 +13,38 @@
  */
 const fetch = require('node-fetch');
 
-const BASE_URL = 'https://creativecommons.tankerkoenig.de/json/list.php';
+/**
+ * @external geolib
+ * @see https://www.npmjs.com/package/geolib
+ */
+const geolib = require('geolib');
+
+const BASE_URL_RADIUS = 'https://creativecommons.tankerkoenig.de/json/list.php';
+const BASE_URL_STATION = 'https://creativecommons.tankerkoenig.de/json/detail.php';
 
 let config;
 
 /**
- * @function generateUrl
+ * @function generateUrlRadius
  * @description Helper function to generate API request url.
  *
  * @returns {string} url
  */
-function generateUrl() {
-    return `${BASE_URL}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
+function generateUrlRadius() {
+    return `${BASE_URL_RADIUS}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
         config.api_key}&sort=dist`;
+}
+
+/**
+ * @function generateUrlStation
+ * @description Helper function to generate API request url.
+ *
+ * @param {Object} id - Gas Station id
+ *
+ * @returns {string} url
+ */
+function generateUrlStation(id) {
+    return `${BASE_URL_STATION}?id=${id}&apikey=${config.api_key}`;
 }
 
 /**
@@ -45,6 +64,25 @@ function sortByPrice(a, b) {
     }
 
     return a[config.sortBy] - b[config.sortBy];
+}
+
+/**
+ * @function sortByDistance
+ * @description Helper function to sort gas stations by distance.
+ *
+ * @param {Object} a - Gas Station
+ * @param {Object} b - Gas Station
+ *
+ * @returns {number} Sorting weight.
+ */
+function sortByDistance(a, b) {
+    if (b.dist === 0) {
+        return Number.MIN_SAFE_INTEGER;
+    } else if (a.dist === 0) {
+        return Number.MAX_SAFE_INTEGER;
+    }
+
+    return a.dist - b.dist;
 }
 
 /**
@@ -100,19 +138,50 @@ function normalizeStations(value, index, stations) {
  * @see apis
  */
 async function getData() {
-    const response = await fetch(generateUrl());
-    const parsedResponse = await response.json();
-
+    let response = await fetch(generateUrlRadius());
+    let parsedResponse = await response.json();
 
     if (!parsedResponse.ok) {
-        throw new Error('Error no fuel data');
+        throw new Error('Error no fuel radius data');
     }
 
-    const stations = parsedResponse.stations.filter(filterStations);
+    // Add stations by radius
+    const stations = parsedResponse.stations;
 
-    stations.forEach(normalizeStations);
+    if (Array.isArray(config.stations)) {
+        for (let i = 0; i < config.stations.length; i += 1) {
+            response = await fetch(generateUrlStation(config.stations[i]));
+            parsedResponse = await response.json();
 
-    const price = stations.slice(0);
+            if (!parsedResponse.ok) {
+                throw new Error('Error no fuel station detail');
+            }
+
+            const station = parsedResponse.station;
+
+            // Calculate distance in meters
+            const distanceMeters = station.distance = geolib.getDistance({
+                latitude: config.lat,
+                longitude: config.lng,
+            }, {
+                latitude: station.lat,
+                longitude: station.lng,
+            });
+
+            station.dist = (distanceMeters / 1000).toFixed(1);
+
+            // Add station detail
+            stations.push(station)
+        }
+    }
+
+    const stationsFiltered = stations.filter(filterStations);
+    stationsFiltered.forEach(normalizeStations);
+
+    const distance = stationsFiltered.slice(0);
+    distance.sort(sortByDistance);
+
+    const price = stationsFiltered.slice(0);
     price.sort(sortByPrice);
 
     return {
@@ -120,7 +189,7 @@ async function getData() {
         unit: 'km',
         currency: 'EUR',
         byPrice: price,
-        byDistance: stations
+        byDistance: distance
     };
 }
 
