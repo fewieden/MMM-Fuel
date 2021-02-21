@@ -62,8 +62,16 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
 | `updateInterval` | `900000` (15 mins) | How often should the data be fetched. **If your value is to small, you risk to get banned from the API provider. I suggest a minimum of 15mins** |
-| `decimalSeparator` | `.` | Decimal separator for numbers. |
-| `superscriptNine` | `false` | Display the last nine after decimal seperator as superscript nine. |
+
+## Global config
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `locale` | `undefined` | By default it is using your system settings. You can specify the locale in the global MagicMirror config. Possible values are for e.g.: `'en-US'` or `'de-DE'`. |
+
+To set a global config you have to set the value in your config.js file inside the MagicMirror project.
+
+![](.github/global.png)
 
 ### tankerkoenig (Germany only)
 

@@ -43,11 +43,11 @@
                 <td>{{ gasStation.name | shortenText | safe }}</td>
                 {% for type in config.types %}
                     {% if includes(priceList.types, type)  %}
-                        <td class="centered">{{ gasStation.prices[type] | superscriptNine | formatPrice | decimalSeparator | safe }}</td>
+                        <td class="centered">{{ gasStation.prices[type] | formatPrice | safe }}</td>
                     {% endif %}
                 {% endfor %}
                 {% if config.showDistance %}
-                    <td class="centered">{{ gasStation.distance | decimalSeparator }} {{ priceList.unit }}</td>
+                    <td class="centered">{{ gasStation.distance | formatDistance }}</td>
                 {% endif %}
                 {% if config.open %}
                     <td class="centered">
