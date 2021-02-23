@@ -19,32 +19,44 @@ const fetch = require('node-fetch');
  */
 const geolib = require('geolib');
 
-const BASE_URL_RADIUS = 'https://creativecommons.tankerkoenig.de/json/list.php';
-const BASE_URL_STATION = 'https://creativecommons.tankerkoenig.de/json/detail.php';
+const BASE_URL = 'https://creativecommons.tankerkoenig.de/json';
 
 let config;
+let stationInfos;
 
 /**
- * @function generateUrlRadius
+ * @function generateRadiusUrl
  * @description Helper function to generate API request url.
  *
  * @returns {string} url
  */
-function generateUrlRadius() {
-    return `${BASE_URL_RADIUS}?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
+function generateRadiusUrl() {
+    return `${BASE_URL}/list.php?lat=${config.lat}&lng=${config.lng}&rad=${config.radius}&type=all&apikey=${
         config.api_key}&sort=dist`;
 }
 
 /**
- * @function generateUrlStation
+ * @function generateStationPricesUrl
  * @description Helper function to generate API request url.
  *
- * @param {Object} id - Gas Station id
+ * @param {string[]} ids - Gas Station IDs
  *
  * @returns {string} url
  */
-function generateUrlStation(id) {
-    return `${BASE_URL_STATION}?id=${id}&apikey=${config.api_key}`;
+function generateStationPricesUrl(ids) {
+    return `${BASE_URL}/prices.php?ids=${ids.join(',')}&apikey=${config.api_key}`;
+}
+
+/**
+ * @function generateStationInfoUrl
+ * @description Helper function to generate API request url.
+ *
+ * @param {string} id - Gas Station ID
+ *
+ * @returns {string} url
+ */
+function generateStationInfoUrl(id) {
+    return `${BASE_URL}/detail.php?id=${id}&apikey=${config.api_key}`;
 }
 
 /**
@@ -129,6 +141,115 @@ function normalizeStations(value, index, stations) {
 }
 
 /**
+ * @function getPricesByRadius
+ * @description Fetches the prices by radius.
+ * @async
+ *
+ * @returns {Object[]} List of stations in raw format.
+ */
+async function getPricesByRadius() {
+    const response = await fetch(generateRadiusUrl());
+    const parsedResponse = await response.json();
+
+    if (!parsedResponse.ok) {
+        throw new Error('Error no fuel radius prices');
+    }
+
+    return parsedResponse.stations;
+}
+
+/**
+ * @function setStationInfos
+ * @description Initializes the gas station information.
+ * @async
+ *
+ * @returns {void}
+ */
+async function setStationInfos() {
+    if (config.stationIds.length > 10) {
+        console.warn(`MMM-Fuel: You can only ask for a maximum of 10 station prices`);
+        config.stations = config.stationIds.slice(0, 10);
+    }
+
+    stationInfos = {};
+
+    for (const stationId of config.stationIds) {
+        const response = await fetch(generateStationInfoUrl(stationId));
+        const parsedResponse = await response.json();
+
+        if (!parsedResponse.ok) {
+            throw new Error('Error no fuel station detail');
+        }
+
+        const station = parsedResponse.station;
+
+        const distanceMeters = geolib.getDistance({
+            latitude: config.lat,
+            longitude: config.lng,
+        }, {
+            latitude: station.lat,
+            longitude: station.lng,
+        }, 100);
+
+        stationInfos[station.id] = {...station, dist: distanceMeters / 1000};
+    }
+}
+
+/**
+ * @function getPricing
+ * @description Helper function to calculate prices for getPricesByStationList.
+ * @async
+ *
+ * @returns {Object} Fuel prices for all types.
+ */
+function getPricing({status, ...prices}) {
+    let pricing = {diesel: -1, e5: -1, e10: -1};
+
+    if (status !== 'open') {
+        return pricing;
+    }
+
+    for (const type in prices) {
+        if (prices[type]) {
+            pricing[type] = prices[type];
+        }
+    }
+
+    return pricing;
+}
+
+/**
+ * @function getPricesByStationList
+ * @description Fetches the prices by station ID list.
+ * @async
+ *
+ * @returns {Object[]} List of stations in raw format.
+ */
+async function getPricesByStationList() {
+    if (!stationInfos) {
+        await setStationInfos();
+    }
+
+    const response = await fetch(generateStationPricesUrl(Object.keys(stationInfos)));
+    const parsedResponse = await response.json();
+
+    if (!parsedResponse.ok) {
+        throw new Error('Error no fuel station prices');
+    }
+
+    let stations = [];
+    for (const [stationId, info] of Object.entries(parsedResponse.prices)) {
+        stations.push({
+            ...stationInfos[stationId],
+            isOpen: info.status !== 'closed',
+            prices: getPricing(info)
+        });
+    }
+
+    return stations;
+}
+
+/**
  * @function getData
  * @description Performs the data query and processing.
  * @async
@@ -138,41 +259,11 @@ function normalizeStations(value, index, stations) {
  * @see apis
  */
 async function getData() {
-    let response = await fetch(generateUrlRadius());
-    let parsedResponse = await response.json();
-
-    if (!parsedResponse.ok) {
-        throw new Error('Error no fuel radius data');
-    }
-
-    // Add stations by radius
-    const stations = parsedResponse.stations;
-
-    if (Array.isArray(config.stations)) {
-        for (let i = 0; i < config.stations.length; i += 1) {
-            response = await fetch(generateUrlStation(config.stations[i]));
-            parsedResponse = await response.json();
-
-            if (!parsedResponse.ok) {
-                throw new Error('Error no fuel station detail');
-            }
-
-            const station = parsedResponse.station;
-
-            // Calculate distance in meters
-            const distanceMeters = station.distance = geolib.getDistance({
-                latitude: config.lat,
-                longitude: config.lng,
-            }, {
-                latitude: station.lat,
-                longitude: station.lng,
-            });
-
-            station.dist = (distanceMeters / 1000).toFixed(1);
-
-            // Add station detail
-            stations.push(station)
-        }
+    let stations = [];
+    if (Array.isArray(config.stationIds)) {
+        stations = await getPricesByStationList();
+    } else {
+        stations = await getPricesByRadius();
     }
 
     const stationsFiltered = stations.filter(filterStations);

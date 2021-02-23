@@ -82,8 +82,8 @@ or your API access will be suspended.
 | --- | --- | --- |
 | `api_key` | REQUIRED | Get an API key for free access to the data of [tankerkoenig.de](https://creativecommons.tankerkoenig.de/#register). |
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `e10`. |
-| `radius` | `5` | Valid range is 1-25. |
-| `stations` | `[]` | Optional array of fuel station ids to include in additon to the radius. You can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html). |
+| `radius` | `5` | Valid range is 1-25. Not required if `stationIds` are provided. |
+| `stationIds` | `[]` | Optional array of fuel station ids to fetch instead of the radius. You can only specify a maximum of 10 and you can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html). |
 
 ### spritpreisrechner (Austria only)
 
