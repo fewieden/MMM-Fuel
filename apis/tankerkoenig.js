@@ -163,9 +163,17 @@ async function getPricesByRadius() {
  * @description Initializes the gas station information.
  * @async
  *
+ * @param {Object[]} stationsByRadius - Gas Stations by radius. Used to filter out possible duplicate stations.
+ *
  * @returns {void}
  */
-async function setStationInfos() {
+async function setStationInfos(stationsByRadius) {
+
+    // Filter out possible duplicate stations which are included in the radius search.
+    for (const station of stationsByRadius) {
+        config.stationIds = config.stationIds.filter(e => e !== station.id);
+    }
+
     if (config.stationIds.length > 10) {
         console.warn(`MMM-Fuel: You can only ask for a maximum of 10 station prices`);
         config.stations = config.stationIds.slice(0, 10);
@@ -191,7 +199,7 @@ async function setStationInfos() {
             longitude: station.lng,
         }, 100);
 
-        stationInfos[station.id] = {...station, dist: distanceMeters / 1000};
+        stationInfos[station.id] = { ...station, dist: distanceMeters / 1000 };
     }
 }
 
@@ -202,8 +210,8 @@ async function setStationInfos() {
  *
  * @returns {Object} Fuel prices for all types.
  */
-function getPricing({status, ...prices}) {
-    let pricing = {diesel: -1, e5: -1, e10: -1};
+function getPricing({ status, ...prices }) {
+    const pricing = { diesel: -1, e5: -1, e10: -1 };
 
     if (status !== 'open') {
         return pricing;
@@ -223,11 +231,13 @@ function getPricing({status, ...prices}) {
  * @description Fetches the prices by station ID list.
  * @async
  *
+ * @param {Object[]} stationsByRadius - Gas Stations by radius. Used to filter out possible duplicate stations.
+ *
  * @returns {Object[]} List of stations in raw format.
  */
-async function getPricesByStationList() {
+async function getPricesByStationList(stationsByRadius) {
     if (!stationInfos) {
-        await setStationInfos();
+        await setStationInfos(stationsByRadius);
     }
 
     const response = await fetch(generateStationPricesUrl(Object.keys(stationInfos)));
@@ -237,7 +247,7 @@ async function getPricesByStationList() {
         throw new Error('Error no fuel station prices');
     }
 
-    let stations = [];
+    const stations = [];
     for (const [stationId, info] of Object.entries(parsedResponse.prices)) {
         stations.push({
             ...stationInfos[stationId],
@@ -260,10 +270,13 @@ async function getPricesByStationList() {
  */
 async function getData() {
     let stations = [];
+
+    if (config.radius > 0) {
+        stations = stations.concat(await getPricesByRadius());
+    }
+
     if (Array.isArray(config.stationIds)) {
-        stations = await getPricesByStationList();
-    } else {
-        stations = await getPricesByRadius();
+        stations = stations.concat(await getPricesByStationList(stations));
     }
 
     const stationsFiltered = stations.filter(filterStations);
