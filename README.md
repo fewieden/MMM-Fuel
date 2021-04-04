@@ -6,7 +6,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 
 ## Examples
 
-![](.github/example.jpg) ![](.github/example2.jpg) ![](.github/example3.png)
+![](.github/fuel.png) ![](.github/example3.png)
 
 ## Dependencies
 
