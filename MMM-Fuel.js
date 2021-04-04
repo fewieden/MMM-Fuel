@@ -7,7 +7,7 @@
  * @see  https://github.com/fewieden/MMM-Fuel
  */
 
-/* global google */
+/* global google Module Log config */
 
 /**
  * @external Module
@@ -421,12 +421,10 @@ Module.register('MMM-Fuel', {
                 return part.value;
             }).join('');
         });
-        this.nunjucksEnvironment().addFilter('formatDistance', distance => {
-            return new Intl.NumberFormat(config.locale, {
-                style: 'unit',
-                unit: this.priceList.unit,
-                maximumFractionDigits: 1
-            }).format(distance);
-        });
+        this.nunjucksEnvironment().addFilter('formatDistance', distance => new Intl.NumberFormat(config.locale, {
+            style: 'unit',
+            unit: this.priceList.unit,
+            maximumFractionDigits: 1
+        }).format(distance));
     }
 });
