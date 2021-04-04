@@ -1,4 +1,4 @@
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/fewieden/MMM-Fuel/master/LICENSE) [![Build Status](https://travis-ci.org/fewieden/MMM-Fuel.svg?branch=master)](https://travis-ci.org/fewieden/MMM-Fuel) [![Code Climate](https://codeclimate.com/github/fewieden/MMM-Fuel/badges/gpa.svg?style=flat)](https://codeclimate.com/github/fewieden/MMM-Fuel) [![Known Vulnerabilities](https://snyk.io/test/github/fewieden/mmm-fuel/badge.svg)](https://snyk.io/test/github/fewieden/mmm-fuel)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/fewieden/MMM-Fuel/master/LICENSE) ![Build status](https://github.com/fewieden/MMM-Fuel/workflows/build/badge.svg) [![Code Climate](https://codeclimate.com/github/fewieden/MMM-Fuel/badges/gpa.svg?style=flat)](https://codeclimate.com/github/fewieden/MMM-Fuel) [![Known Vulnerabilities](https://snyk.io/test/github/fewieden/mmm-fuel/badge.svg)](https://snyk.io/test/github/fewieden/mmm-fuel)
 
 # MMM-Fuel
 
