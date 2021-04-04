@@ -33,18 +33,6 @@
  * @requires external:google
  */
 Module.register('MMM-Fuel', {
-    /** @member {Object} units - Is used to determine the unit symbol of the global config option units. */
-    units: {
-        imperial: 'ml',
-        metric: 'km'
-    },
-
-    /** @member {Object} currencies - Is used to convert currencies into symbols. */
-    currencies: {
-        AUD: '$',
-        EUR: '€'
-    },
-
     /** @member {boolean} sortByPrice - Flag to switch between sorting (price and distance). */
     sortByPrice: true,
     /** @member {?Interval} interval - Toggles sortByPrice */
@@ -410,7 +398,35 @@ Module.register('MMM-Fuel', {
                 return '-';
             }
 
-            return `${this.config.toFixed ? price.toFixed(2) : price} ${this.currencies[this.priceList.currency]}`;
+            let prefix = '';
+            if (typeof price === 'string') {
+                prefix = price[0];
+                price = parseFloat(price.slice(1));
+            }
+
+            const fractionDigits = this.config.toFixed ? 2 : 3;
+
+            const priceParts = new Intl.NumberFormat(config.locale, {
+                style: 'currency',
+                currency: this.priceList.currency,
+                minimumFractionDigits: fractionDigits,
+                maximumFractionDigits: fractionDigits
+            }).formatToParts(price);
+
+            return prefix + priceParts.map(part => {
+                if (!this.config.toFixed && part.type === 'fraction') {
+                    return part.value.slice(0, -1) + part.value.slice(-1).sup();
+                }
+
+                return part.value;
+            }).join('');
+        });
+        this.nunjucksEnvironment().addFilter('formatDistance', distance => {
+            return new Intl.NumberFormat(config.locale, {
+                style: 'unit',
+                unit: this.priceList.unit,
+                maximumFractionDigits: 1
+            }).format(distance);
         });
     }
 });
