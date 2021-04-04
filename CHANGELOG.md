@@ -1,5 +1,15 @@
 # MMM-Fuel Changelog
 
+## [Unreleased]
+
+### Fixed
+
+### Added
+
+### Changed
+
+### Removed
+
 ## [2.2.0]
 
 Thanks to @TheDuffman85 for his contribution to this release.
