@@ -305,12 +305,12 @@ Module.register('MMM-Fuel', {
      * @function initMap
      * @description Initializes the map, markers and layers.
      *
-     * @param {boolean} success - Only initialize the map if success is truthy.
+     * @param {Error} error - Only initialize if modal render callback doesn't contain error.
      *
      * @returns {void}
      */
-    initMap(success) {
-        if (!success || this.map) {
+    initMap(error) {
+        if (error || this.map) {
             return;
         }
 
