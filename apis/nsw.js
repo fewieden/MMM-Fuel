@@ -125,7 +125,7 @@ async function getData() {
 
     return {
         types: ['diesel', 'e5'],
-        unit: 'km',
+        unit: 'kilometer',
         currency: 'AUD',
         byPrice: stations,
         byDistance: distance

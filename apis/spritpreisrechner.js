@@ -180,7 +180,7 @@ async function getData() {
 
     return {
         types: ['diesel', 'e5', 'gas'],
-        unit: 'km',
+        unit: 'kilometer',
         currency: 'EUR',
         byPrice: stations,
         byDistance: distance
