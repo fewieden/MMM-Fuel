@@ -7,6 +7,7 @@
 ### Added
 
 ### Changed
+* Log a warning if no fuel station detail could be fetched
 
 ### Removed
 
