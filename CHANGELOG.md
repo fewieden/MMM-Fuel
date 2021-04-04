@@ -1,5 +1,18 @@
 # MMM-Fuel Changelog
 
+## [2.2.0]
+
+Thanks to @TheDuffman85 for his contribution to this release.
+
+### Added
+
+* Config option `stationIds` to check prices of specific gas stations (Tankerkönig only)
+
+### Changed
+
+* 3rd decimal is now superscripted
+* Price and distance values are now localized based on global config option `locale`.
+
 ## [2.1.2]
 
 ### Added
