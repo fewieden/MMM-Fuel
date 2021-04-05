@@ -186,7 +186,7 @@ async function setStationInfos(stationsByRadius) {
         const parsedResponse = await response.json();
 
         if (!parsedResponse.ok) {
-            console.warn(`No fuel station detail. StationId: ` + stationId + ` Error: ` + parsedResponse.message);
+            console.warn(`No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
             continue;
         }
 
