@@ -1,19 +1,15 @@
 # MMM-Fuel Changelog
 
-## [Unreleased]
+## [2.2.1]
 
 ### Fixed
 
 * Filtering of station ids lead to invalid price request for provider tankerkoenig
 
-### Added
-
 ### Changed
 
 * Log a warning if no fuel station detail could be fetched
 * Updated provider integration documentation
-
-### Removed
 
 ## [2.2.0]
 
