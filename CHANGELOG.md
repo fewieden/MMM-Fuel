@@ -4,9 +4,14 @@
 
 ### Fixed
 
+* Filtering of station ids lead to invalid price request for provider tankerkoenig
+
 ### Added
 
 ### Changed
+
+* Log a warning if no fuel station detail could be fetched
+* Updated provider integration documentation
 
 ### Removed
 
