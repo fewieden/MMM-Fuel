@@ -31,8 +31,8 @@ The response has to have the following format:
 ```
 {
     types: ['diesel', 'e5', 'e10'], // Array | types supported by the API provider.
-    unit: 'km', // String | unit for the distance either in kilometres (km) or miles (ml).
-    currency: 'EUR', // String | curreny of the fuel prices either in EUR or USD.
+    unit: 'km', // String | unit for the distance either `kilometer` or `mile`.
+    currency: 'EUR', // String | 3 character representation of the currency for the fuel prices e.g. `EUR`, `USD` or `AUD`.
     byPrice: stations, // Array | stations (see above) sorted by price.
     byDistance: distance // Array | stations (see above) sorted by distance.
 };

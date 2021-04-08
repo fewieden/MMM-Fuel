@@ -7,7 +7,9 @@
 ### Added
 
 ### Changed
+
 * Log a warning if no fuel station detail could be fetched
+* Updated provider integration documentation
 
 ### Removed
 
