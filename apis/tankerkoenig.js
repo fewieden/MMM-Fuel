@@ -168,10 +168,8 @@ async function getPricesByRadius() {
  * @returns {void}
  */
 async function setStationInfos(stationsByRadius) {
-
-    // Filter out possible duplicate stations which are included in the radius search.
     for (const station of stationsByRadius) {
-        config.stationIds = config.stationIds.filter(e => e !== station.id);
+        config.stationIds = config.stationIds.filter(id => id !== station.id);
     }
 
     if (config.stationIds.length > 10) {
@@ -186,7 +184,7 @@ async function setStationInfos(stationsByRadius) {
         const parsedResponse = await response.json();
 
         if (!parsedResponse.ok) {
-            console.warn(`No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
+            console.warn(`MMM-Fuel: No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
             continue;
         }
 
@@ -241,14 +239,21 @@ async function getPricesByStationList(stationsByRadius) {
         await setStationInfos(stationsByRadius);
     }
 
-    const response = await fetch(generateStationPricesUrl(Object.keys(stationInfos)));
+    const stationIds = Object.keys(stationInfos);
+    const stations = [];
+
+    if (!stationIds.length) {
+        console.warn('MMM-Fuel: Filtered stationIds list is empty');
+        return stations;
+    }
+
+    const response = await fetch(generateStationPricesUrl(stationIds));
     const parsedResponse = await response.json();
 
     if (!parsedResponse.ok) {
         throw new Error('Error no fuel station prices');
     }
 
-    const stations = [];
     for (const [stationId, info] of Object.entries(parsedResponse.prices)) {
         stations.push({
             ...stationInfos[stationId],

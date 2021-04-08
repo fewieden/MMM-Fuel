@@ -4,6 +4,8 @@
 
 ### Fixed
 
+* Filtering of station ids lead to invalid price request for provider tankerkoenig
+
 ### Added
 
 ### Changed
