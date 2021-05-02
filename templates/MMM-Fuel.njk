@@ -58,7 +58,12 @@
             {% if config.showAddress %}
                 <tr>
                     <td colspan="{{ 1 + config.types.length + (1 if config.showDistance else 0) + (1 if config.open else 0) }}" class="xsmall">
-                        {{ gasStation.address | shortenText | safe }}
+                        {% if config.showAddressCity %}
+                            {% set address = gasStation.place + " - " + gasStation.street %}
+                        {% else %}
+                            {% set address = gasStation.street %}
+                        {% endif %}
+                        {{ address | shortenText | safe }}
                     </td>
                 </tr>
             {% endif %}
