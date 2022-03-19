@@ -13,6 +13,7 @@ MagicMirror² version >= 2.15.0 required.
 ### Changed
 
 * Updated Github config files
+* Updated dependencies
 
 ### Removed
 
