@@ -8,6 +8,7 @@ MagicMirror² version >= 2.15.0 required.
 
 ### Added
 
+* Config option: `showBrand`
 * Integrated MagicMirror logger on server side
 
 ### Changed

@@ -40,7 +40,7 @@
         </tr>
         {% for gasStation in gasStations %}
             <tr>
-                <td>{{ gasStation.name | shortenText | safe }}</td>
+                <td>{{ gasStation.brand if config.showBrand else gasStation.name | shortenText | safe }}</td>
                 {% for type in config.types %}
                     {% if includes(priceList.types, type)  %}
                         <td class="centered">{{ gasStation.prices[type] | formatPrice | safe }}</td>
