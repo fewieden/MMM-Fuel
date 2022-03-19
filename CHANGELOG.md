@@ -18,6 +18,7 @@ MagicMirror² version >= 2.15.0 required.
 ### Removed
 
 * Dependency: `fs-extra`
+* Dependency: `geolib`
 
 ## [2.2.1]
 

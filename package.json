@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "moment": "^2.29.1",
-    "node-fetch": "^2.6.7",
-    "geolib": "3.3.3"
+    "node-fetch": "^2.6.7"
   }
 }
