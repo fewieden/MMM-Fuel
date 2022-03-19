@@ -19,6 +19,12 @@ const fetch = require('node-fetch');
  */
 const geolib = require('geolib');
 
+/**
+ * @external logger
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
+ */
+const Log = require('logger');
+
 const BASE_URL = 'https://creativecommons.tankerkoenig.de/json';
 
 let config;
@@ -173,7 +179,7 @@ async function setStationInfos(stationsByRadius) {
     }
 
     if (config.stationIds.length > 10) {
-        console.warn(`MMM-Fuel: You can only ask for a maximum of 10 station prices`);
+        Log.warn(`MMM-Fuel: You can only ask for a maximum of 10 station prices`);
         config.stations = config.stationIds.slice(0, 10);
     }
 
@@ -184,7 +190,7 @@ async function setStationInfos(stationsByRadius) {
         const parsedResponse = await response.json();
 
         if (!parsedResponse.ok) {
-            console.warn(`MMM-Fuel: No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
+            Log.warn(`MMM-Fuel: No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
             continue;
         }
 
@@ -243,7 +249,7 @@ async function getPricesByStationList(stationsByRadius) {
     const stations = [];
 
     if (!stationIds.length) {
-        console.warn('MMM-Fuel: Filtered stationIds list is empty');
+        Log.warn('MMM-Fuel: Filtered stationIds list is empty');
         return stations;
     }
 
@@ -308,6 +314,8 @@ async function getData() {
  * @description Queries data from tankerkoenig.de
  *
  * @requires external:node-fetch
+ * @requires external:geolib
+ * @requires external:logger
  *
  * @param {Object} options - Configuration.
  * @param {number} options.lat - Latitude of Coordinate.

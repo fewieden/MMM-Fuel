@@ -19,6 +19,12 @@ const fetch = require('node-fetch');
  */
 const moment = require('moment');
 
+/**
+ * @external logger
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
+ */
+const Log = require('logger');
+
 const { filterStations, sortByDistance } = require('./utils');
 
 const SECOND = 1000;
@@ -63,7 +69,7 @@ async function refreshToken(config) {
 
         token = parsedResponse.access_token;
     } catch (e) {
-        console.log('MMM-Fuel: Failed to refresh token', e);
+        Log.error('MMM-Fuel: Failed to refresh token', e);
     }
 }
 
@@ -225,6 +231,7 @@ function mapPriceToStation({ stations, prices }) {
  *
  * @requires external:node-fetch
  * @requires external:moment
+ * @requires external:logger
  * @requires module:Utils
  *
  * @param {Object} options - Configuration.

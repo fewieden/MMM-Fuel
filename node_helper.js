@@ -14,6 +14,12 @@
 const NodeHelper = require('node_helper');
 
 /**
+ * @external logger
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
+ */
+const Log = require('logger');
+
+/**
  * @external fs
  * @see https://nodejs.org/api/fs.html
  */
@@ -32,8 +38,12 @@ const path = require('path');
  * @requires external:fs
  * @requires external:path
  * @requires external:node_helper
+ * @requires external:logger
  */
 module.exports = NodeHelper.create({
+    /** @member {string} requiresVersion - Specifies minimum required version of MagicMirror². */
+    requiresVersion: '2.15.0',
+
     /**
      * @function providerExists
      * @description Checks if the provider exists.
@@ -77,7 +87,7 @@ module.exports = NodeHelper.create({
                     this.getData();
                 }, this.config.updateInterval);
             } else {
-                console.log(`${this.name}: Couldn't load provider ${this.config.provider}`);
+                Log.error(`${this.name}: Couldn't load provider ${this.config.provider}`);
             }
         }
     },
@@ -94,7 +104,7 @@ module.exports = NodeHelper.create({
             const data = await this.provider.getData();
             this.sendSocketNotification('PRICELIST', data);
         } catch (e) {
-            console.log(e);
+            Log.error(`${this.name}: Failed to retrieve prices`, e);
         }
     }
 });

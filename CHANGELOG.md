@@ -2,15 +2,19 @@
 
 ## [Unreleased]
 
+MagicMirror² version >= 2.15.0 required.
+
 ### Fixed
 
 ### Added
+
+* Integrated MagicMirror logger on server side
 
 ### Changed
 
 ### Removed
 
-* Dependency fs-extra
+* Dependency: `fs-extra`
 
 ## [2.2.1]
 
