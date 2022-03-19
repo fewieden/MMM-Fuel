@@ -12,6 +12,8 @@ MagicMirror² version >= 2.15.0 required.
 
 ### Changed
 
+* Updated Github config files
+
 ### Removed
 
 * Dependency: `fs-extra`

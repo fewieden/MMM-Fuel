@@ -2,7 +2,7 @@ Platform (Hardware/OS):
 
 Node version:
 
-MagicMirror version:
+MagicMirror² version:
 
 Module version:
 
