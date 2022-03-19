@@ -14,10 +14,10 @@
 const NodeHelper = require('node_helper');
 
 /**
- * @external fs-extra
- * @see https://www.npmjs.com/package/fs-extra
+ * @external fs
+ * @see https://nodejs.org/api/fs.html
  */
-const fs = require('fs-extra');
+const fs = require('fs/promises');
 
 /**
  * @external path
@@ -29,20 +29,27 @@ const path = require('path');
  * @module node_helper
  * @description Backend for the module to query data from the API providers.
  *
- * @requires external:fs-extra
+ * @requires external:fs
+ * @requires external:path
  * @requires external:node_helper
  */
 module.exports = NodeHelper.create({
-
     /**
-     * @function start
-     * @description Logs a start message to the console.
-     * @override
+     * @function providerExists
+     * @description Checks if the provider exists.
+     * @async
      *
-     * @returns {void}
+     * @param {string} providerName - Name of the provider
+     *
+     * @returns {boolean}
      */
-    start() {
-        console.log(`Starting module helper: ${this.name}`);
+    async providerExists(providerName) {
+        try {
+            await fs.access(path.join(__dirname, 'apis', `${providerName}.js`));
+            return true;
+        } catch {
+            return false;
+        }
     },
 
     /**
@@ -59,7 +66,10 @@ module.exports = NodeHelper.create({
     async socketNotificationReceived(notification, payload) {
         if (notification === 'CONFIG') {
             this.config = payload;
-            if (await fs.pathExists(path.join(__dirname, 'apis', `${this.config.provider}.js`))) {
+
+            const providerExists = await this.providerExists(this.config.provider);
+
+            if (providerExists) {
                 // eslint-disable-next-line global-require, import/no-dynamic-require
                 this.provider = await require(`./apis/${this.config.provider}`)(this.config);
                 this.getData();

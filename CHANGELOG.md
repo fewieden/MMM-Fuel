@@ -10,6 +10,8 @@
 
 ### Removed
 
+* Dependency fs-extra
+
 ## [2.2.1]
 
 ### Fixed

@@ -29,7 +29,6 @@
     "stylelint-config-standard": "^20.0.0"
   },
   "dependencies": {
-    "fs-extra": "^9.0.1",
     "moment": "^2.29.1",
     "node-fetch": "^2.6.1",
     "geolib": "3.3.1"
