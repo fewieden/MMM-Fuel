@@ -10,6 +10,7 @@ MagicMirror² version >= 2.15.0 required.
 
 * Config option: `showBrand`
 * Integrated MagicMirror logger on server side
+* Dependency: `node-html-parser`
 
 ### Changed
 

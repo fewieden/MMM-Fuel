@@ -15,6 +15,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 * npm
 * [node-fetch](https://www.npmjs.com/package/node-fetch)
 * [moment](https://www.npmjs.com/package/moment)
+* [node-html-parser](https://www.npmjs.com/package/node-html-parser)
 
 ## Installation
 

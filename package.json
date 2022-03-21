@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "moment": "^2.29.1",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "node-html-parser": "^5.3.3"
   }
 }
