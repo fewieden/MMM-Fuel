@@ -17,7 +17,7 @@ const fetch = require('node-fetch');
  * @external node-html-parser
  * @see https://www.npmjs.com/package/node-html-parser
  */
-const {parse} = require('node-html-parser');
+const { parse } = require('node-html-parser');
 
 const BASE_URL = 'https://www.autoblog.com';
 const MAX_PAGE = 2;
@@ -54,7 +54,7 @@ function mapGasStation(htmlGasStation, type) {
     return {
         name: htmlGasStation.querySelector('li.name h4').text,
         address: htmlGasStation.querySelector('li.name address').text,
-        prices: {[type]: parseFloat(htmlGasStation.querySelector('li.price data.price').getAttribute('value'))},
+        prices: { [type]: parseFloat(htmlGasStation.querySelector('li.price data.price').getAttribute('value')) },
         distance: parseFloat(htmlGasStation.querySelector('li.dist data.distance').getAttribute('value')),
     };
 }
@@ -69,7 +69,7 @@ function mapGasStation(htmlGasStation, type) {
  * @returns {void}
  */
 function fillMissingPrices(stations, maxPricesByType) {
-    for (let station of stations) {
+    for (const station of stations) {
         for (const type of config.types) {
             if (!station.prices[type]) {
                 station.prices[type] = `>${maxPricesByType[type]}`;
@@ -154,8 +154,8 @@ async function fetchPaginatedStations(type, path) {
  * @see apis/README.md
  */
 async function getData() {
-    let maxPricesByType = {};
-    let indexedStations = {};
+    const maxPricesByType = {};
+    const indexedStations = {};
 
     for (const type of config.types) {
         const paths = getRequestPaths(type);

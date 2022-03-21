@@ -51,13 +51,13 @@ module.exports = NodeHelper.create({
      *
      * @param {string} providerName - Name of the provider
      *
-     * @returns {boolean}
+     * @returns {boolean} Does provider exist?
      */
     async providerExists(providerName) {
         try {
             await fs.access(path.join(__dirname, 'apis', `${providerName}.js`));
             return true;
-        } catch {
+        } catch (e) {
             return false;
         }
     },
