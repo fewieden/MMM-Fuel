@@ -1,10 +1,8 @@
 # MMM-Fuel Changelog
 
-## [Unreleased]
+## [2.3.0]
 
 MagicMirror² version >= 2.15.0 required.
-
-### Fixed
 
 ### Added
 
