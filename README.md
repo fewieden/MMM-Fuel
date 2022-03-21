@@ -99,6 +99,22 @@ No API key required.
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
 | `showBrand` | `false` | The API provider does not return brand information. |
 
+### autoblog (USA only)
+
+No API key required. The displayed distance is not based on your coordinates but on the zip code.
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `provider` | `"tankerkoenig"` | Make sure you set it to `"autoblog"`. |
+| `zip` | REQUIRED | The zip code of your address, e.g. `"12345"` |
+| `types` | `["diesel"]` | Valid options are `regular`, `mid-grade`, `premium` and `diesel`. |
+| `radius` | `5` | Valid range not tested yet. |
+| `lat` | `undefined` | Not supported |
+| `lng` | `undefined` | Not supported |
+| `open` | `false` | Not supported |
+| `showOpenOnly` | `false` | Not supported |
+| `showBrand` | `false` | Not supported |
+
 ### nsw (Australia NSW only)
 
 This provider gives no information if the gas stations are open or closed.
