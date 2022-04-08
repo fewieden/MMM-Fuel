@@ -215,7 +215,7 @@ function mapPriceToStation({ stations, prices }) {
     for (const station of stations) {
         for (const price of prices) {
             if (station.code === price.stationcode) {
-                station.price = price.price;
+                station.price = price.price / 100;
                 break;
             }
         }
