@@ -1,5 +1,11 @@
 # MMM-Fuel Changelog
 
+## [2.2.2]
+
+### Added
+
+* Config option `excludeStationIds` to exclude gas stations from radius (Tankerkönig only)
+
 ## [2.2.1]
 
 ### Fixed
