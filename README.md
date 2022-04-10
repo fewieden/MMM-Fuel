@@ -13,8 +13,9 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
 * OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice) and [MMM-Modal](https://github.com/fewieden/MMM-Modal)
 * npm
-* [fs-extra](https://www.npmjs.com/package/fs-extra)
 * [node-fetch](https://www.npmjs.com/package/node-fetch)
+* [moment](https://www.npmjs.com/package/moment)
+* [node-html-parser](https://www.npmjs.com/package/node-html-parser)
 
 ## Installation
 
@@ -58,6 +59,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `showAddress` | `true` | Boolean to show the gas stations address. |
 | `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
 | `showDistance` | `true` | Boolean to show the distance to your specified position. |
+| `showBrand` | `false` | Boolean to show the brand instead of the name. |
 | `iconHeader` | `true` | Boolean to display the car icon in the header. |
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
@@ -96,6 +98,23 @@ No API key required.
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `gas`. |
 | `radius` | `5` | Valid range not tested yet. |
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
+| `showBrand` | `false` | The API provider does not return brand information. |
+
+### autoblog (USA only)
+
+No API key required. The displayed distance is not based on your coordinates but on the zip code.
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `provider` | `"tankerkoenig"` | Make sure you set it to `"autoblog"`. |
+| `zip` | REQUIRED | The zip code of your address, e.g. `"12345"` |
+| `types` | `["diesel"]` | Valid options are `regular`, `mid-grade`, `premium` and `diesel`. |
+| `radius` | `5` | Valid range not tested yet. |
+| `lat` | `undefined` | Not supported |
+| `lng` | `undefined` | Not supported |
+| `open` | `false` | Not supported |
+| `showOpenOnly` | `false` | Not supported |
+| `showBrand` | `false` | Not supported |
 
 ### nsw (Australia NSW only)
 

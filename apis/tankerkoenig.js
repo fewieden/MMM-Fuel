@@ -14,10 +14,10 @@
 const fetch = require('node-fetch');
 
 /**
- * @external geolib
- * @see https://www.npmjs.com/package/geolib
+ * @external logger
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
  */
-const geolib = require('geolib');
+const Log = require('logger');
 
 const BASE_URL = 'https://creativecommons.tankerkoenig.de/json';
 
@@ -161,6 +161,46 @@ async function getPricesByRadius() {
 }
 
 /**
+ * @function degreesToRadians
+ * @description Converst degrees to radians
+ * @see https://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates/365853#365853
+ *
+ * @param {number} degrees - Degrees
+ *
+ * @returns {number} Radians
+ */
+function degreesToRadians(degrees) {
+    return degrees * Math.PI / 180;
+}
+
+/**
+ * @function distanceInMBetweenCoordinates
+ * @description Calculates the distance of two coordinates in meters.
+ * @see https://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates/365853#365853
+ *
+ * @param {number} lat1 - Latitude of point 1.
+ * @param {number} lon1 - Longitude of point 1.
+ * @param {number} lat2 - Latitude of point 2.
+ * @param {number} lon2 - Longitude of point 2.
+ *
+ * @returns {number} Distance in meters rounded to the closest 100m.
+ */
+function distanceInMBetweenCoordinates(lat1, lon1, lat2, lon2) {
+    const earthRadiusM = 6371000;
+
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
+
+    lat1 = degreesToRadians(lat1);
+    lat2 = degreesToRadians(lat2);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return Math.round(earthRadiusM * c / 100) * 100;
+}
+
+/**
  * @function setStationInfos
  * @description Initializes the gas station information.
  * @async
@@ -175,7 +215,7 @@ async function setStationInfos(stationsByRadius) {
     }
 
     if (config.stationIds.length > 10) {
-        console.warn(`MMM-Fuel: You can only ask for a maximum of 10 station prices`);
+        Log.warn(`MMM-Fuel: You can only ask for a maximum of 10 station prices`);
         config.stations = config.stationIds.slice(0, 10);
     }
 
@@ -186,19 +226,13 @@ async function setStationInfos(stationsByRadius) {
         const parsedResponse = await response.json();
 
         if (!parsedResponse.ok) {
-            console.warn(`MMM-Fuel: No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
+            Log.warn(`MMM-Fuel: No fuel station detail. StationId: ${stationId} Error: ${parsedResponse.message}`);
             continue;
         }
 
         const station = parsedResponse.station;
 
-        const distanceMeters = geolib.getDistance({
-            latitude: config.lat,
-            longitude: config.lng,
-        }, {
-            latitude: station.lat,
-            longitude: station.lng,
-        }, 100);
+        const distanceMeters = distanceInMBetweenCoordinates(config.lat, config.lng, station.lat, station.lng);
 
         stationInfos[station.id] = { ...station, dist: distanceMeters / 1000 };
     }
@@ -245,7 +279,7 @@ async function getPricesByStationList(stationsByRadius) {
     const stations = [];
 
     if (!stationIds.length) {
-        console.warn('MMM-Fuel: Filtered stationIds list is empty');
+        Log.warn('MMM-Fuel: Filtered stationIds list is empty');
         return stations;
     }
 
@@ -310,6 +344,7 @@ async function getData() {
  * @description Queries data from tankerkoenig.de
  *
  * @requires external:node-fetch
+ * @requires external:logger
  *
  * @param {Object} options - Configuration.
  * @param {number} options.lat - Latitude of Coordinate.

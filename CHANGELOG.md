@@ -1,10 +1,31 @@
 # MMM-Fuel Changelog
 
-## [2.2.2]
+## [2.3.1]
 
 ### Added
 
 * Config option `excludeStationIds` to exclude gas stations from radius (Tankerkönig only)
+
+## [2.3.0]
+
+MagicMirror² version >= 2.15.0 required.
+
+### Added
+
+* Provider: `autoblog`
+* Config option: `showBrand`
+* Integrated MagicMirror logger on server side
+* Dependency: `node-html-parser`
+
+### Changed
+
+* Updated Github config files
+* Updated dependencies
+
+### Removed
+
+* Dependency: `fs-extra`
+* Dependency: `geolib`
 
 ## [2.2.1]
 

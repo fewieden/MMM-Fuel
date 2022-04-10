@@ -14,10 +14,16 @@
 const NodeHelper = require('node_helper');
 
 /**
- * @external fs-extra
- * @see https://www.npmjs.com/package/fs-extra
+ * @external logger
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
  */
-const fs = require('fs-extra');
+const Log = require('logger');
+
+/**
+ * @external fs
+ * @see https://nodejs.org/api/fs.html
+ */
+const fs = require('fs/promises');
 
 /**
  * @external path
@@ -29,20 +35,31 @@ const path = require('path');
  * @module node_helper
  * @description Backend for the module to query data from the API providers.
  *
- * @requires external:fs-extra
+ * @requires external:fs
+ * @requires external:path
  * @requires external:node_helper
+ * @requires external:logger
  */
 module.exports = NodeHelper.create({
+    /** @member {string} requiresVersion - Specifies minimum required version of MagicMirror². */
+    requiresVersion: '2.15.0',
 
     /**
-     * @function start
-     * @description Logs a start message to the console.
-     * @override
+     * @function providerExists
+     * @description Checks if the provider exists.
+     * @async
      *
-     * @returns {void}
+     * @param {string} providerName - Name of the provider
+     *
+     * @returns {boolean} Does provider exist?
      */
-    start() {
-        console.log(`Starting module helper: ${this.name}`);
+    async providerExists(providerName) {
+        try {
+            await fs.access(path.join(__dirname, 'apis', `${providerName}.js`));
+            return true;
+        } catch (e) {
+            return false;
+        }
     },
 
     /**
@@ -59,7 +76,10 @@ module.exports = NodeHelper.create({
     async socketNotificationReceived(notification, payload) {
         if (notification === 'CONFIG') {
             this.config = payload;
-            if (await fs.pathExists(path.join(__dirname, 'apis', `${this.config.provider}.js`))) {
+
+            const providerExists = await this.providerExists(this.config.provider);
+
+            if (providerExists) {
                 // eslint-disable-next-line global-require, import/no-dynamic-require
                 this.provider = await require(`./apis/${this.config.provider}`)(this.config);
                 this.getData();
@@ -67,7 +87,7 @@ module.exports = NodeHelper.create({
                     this.getData();
                 }, this.config.updateInterval);
             } else {
-                console.log(`${this.name}: Couldn't load provider ${this.config.provider}`);
+                Log.error(`${this.name}: Couldn't load provider ${this.config.provider}`);
             }
         }
     },
@@ -84,7 +104,7 @@ module.exports = NodeHelper.create({
             const data = await this.provider.getData();
             this.sendSocketNotification('PRICELIST', data);
         } catch (e) {
-            console.log(e);
+            Log.error(`${this.name}: Failed to retrieve prices`, e);
         }
     }
 });
