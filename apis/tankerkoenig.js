@@ -314,9 +314,9 @@ async function getData() {
     if (config.radius > 0) {
         stations = stations.concat(await getPricesByRadius());
     }
-    
+
     stations = stations.concat(await getPricesByStationList(stations));
-    
+
     const stationsFiltered = stations.filter(filterStations);
     stationsFiltered.forEach(normalizeStations);
 
