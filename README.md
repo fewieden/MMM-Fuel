@@ -86,6 +86,7 @@ or your API access will be suspended.
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `e10`. |
 | `radius` | `5` | Valid range is 0-25. Set to 0 to disable. Not required if `stationIds` are provided. |
 | `stationIds` | `[]` | Optional array of fuel station ids to fetch instead of the radius. You can only specify a maximum of 10 and you can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html). Using radius and station ids in parallel will result in more API calls. If you run into issues increase the `updateInterval`. |
+| `excludeStationIds` | `[]` | Optional array of fuel station ids to exclude from the radius. This is useful e.g. if you got a non public or truck exclusive station in the radius. You can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html).|
 
 ### spritpreisrechner (Austria only)
 

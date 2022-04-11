@@ -107,7 +107,7 @@ function sortByDistance(a, b) {
  */
 function filterStations(station) {
     for (let i = 0; i < config.types.length; i += 1) {
-        if (station[config.types[i]] <= 0 || config.showOpenOnly && !station.isOpen) {
+        if (station[config.types[i]] <= 0 || config.showOpenOnly && !station.isOpen || config.excludeStationIds.includes(station.id)) {
             return false;
         }
     }
@@ -315,9 +315,7 @@ async function getData() {
         stations = stations.concat(await getPricesByRadius());
     }
 
-    if (Array.isArray(config.stationIds)) {
-        stations = stations.concat(await getPricesByStationList(stations));
-    }
+    stations = stations.concat(await getPricesByStationList(stations));
 
     const stationsFiltered = stations.filter(filterStations);
     stationsFiltered.forEach(normalizeStations);
