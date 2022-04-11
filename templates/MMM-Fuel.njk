@@ -21,7 +21,7 @@
                     <th class="centered">
                         <span>{{ type | capitalizeFirstLetter }}</span>
                         {% if sortByPrice and config.sortBy == type %}
-                            <i class="fa fa-long-arrow-down sortBy"></i>
+                            <i class="fa fa-long-arrow-down sort-By"></i>
                         {% endif %}
                     </th>
                 {% endif %}
@@ -30,7 +30,7 @@
                 <th class="centered">
                     <i class="fa fa-map-o"></i>
                     {% if not sortByPrice %}
-                        <i class="fa fa-long-arrow-down sortBy"></i>
+                        <i class="fa fa-long-arrow-down sort-By"></i>
                     {% endif %}
                 </th>
             {% endif %}
