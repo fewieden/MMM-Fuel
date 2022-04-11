@@ -83,7 +83,9 @@ Module.register('MMM-Fuel', {
         rotateInterval: 60 * 1000, // every minute
         updateInterval: 15 * 60 * 1000, // every 15 minutes
         provider: 'tankerkoenig',
-        toFixed: false
+        toFixed: false,        
+        stationIds: [],
+        excludeStationIds: []
     },
 
     /**

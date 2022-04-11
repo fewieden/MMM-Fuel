@@ -106,10 +106,8 @@ function sortByDistance(a, b) {
  * @returns {boolean} To keep or filter the station.
  */
 function filterStations(station) {
-    const excludeStations = Array.isArray(config.excludeStationIds);
-
     for (let i = 0; i < config.types.length; i += 1) {
-        if (station[config.types[i]] <= 0 || config.showOpenOnly && !station.isOpen || excludeStations && config.excludeStationIds.includes(station.id)) {
+        if (station[config.types[i]] <= 0 || config.showOpenOnly && !station.isOpen || config.excludeStationIds.includes(station.id)) {
             return false;
         }
     }
@@ -316,11 +314,9 @@ async function getData() {
     if (config.radius > 0) {
         stations = stations.concat(await getPricesByRadius());
     }
-
-    if (Array.isArray(config.stationIds)) {
-        stations = stations.concat(await getPricesByStationList(stations));
-    }
-
+    
+    stations = stations.concat(await getPricesByStationList(stations));
+    
     const stationsFiltered = stations.filter(filterStations);
     stationsFiltered.forEach(normalizeStations);
 
