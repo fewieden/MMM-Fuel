@@ -89,19 +89,15 @@ function sortByPrice(a, b) {
     const aPrice = a.prices[config.sortBy];
     const bPrice = b.prices[config.sortBy];
 
-    if (!isNaN(aPrice) && isNaN(bPrice)) {
-        return -1;
-    } else if (isNaN(aPrice) && !isNaN(bPrice)) {
-        return 1;
-    } else if (!isNaN(aPrice) && !isNaN(bPrice)) {
-        if (aPrice < bPrice) {
-            return -1;
-        } else if (aPrice > bPrice) {
-            return 1;
-        }
+    if (!isNaN(aPrice) || !isNaN(bPrice)) {
+        return isNaN(aPrice) ? 1 : -1;
     }
 
-    return 0;
+    if (aPrice < bPrice) {
+        return -1;
+    }
+
+    return aPrice > bPrice ? 1 : 0;
 }
 
 /**
@@ -168,22 +164,15 @@ async function getAllStations() {
 }
 
 /**
- * @function getData
- * @description Performs the data query and processing.
- * @async
+ * @function mergePrices
+ * @description Merges fuel prices of different types of gas station
  *
- * @returns {Object} Returns object described in the provider documentation.
- *
- * @see apis/README.md
+ * @returns {Object} Returns gas stations with merged prices and max prices per fuel type.
  */
-async function getData() {
-    const maxPricesByType = {};
-    const indexedStations = {};
-
-    const responses = await getAllStations();
-
-    for (const station of responses) {
+function mergePrices(responses) {
+    const {indexedStations, maxPricesByType} = responses.reduce(({indexedStations, maxPricesByType}, station) => {
         const stationKey = `${station.name}-${station.address}`;
+
         if (!indexedStations[stationKey]) {
             indexedStations[stationKey] = station;
         } else {
@@ -193,9 +182,26 @@ async function getData() {
         if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
             maxPricesByType[station.fuelType] = station.prices[station.fuelType];
         }
-    }
 
-    let stations = Object.values(indexedStations);
+        return {indexedStations, maxPricesByType};
+    }, {indexedStations: {}, maxPricesByType: {}});
+
+    return {stations: Object.values(indexedStations), maxPricesByType};
+}
+
+/**
+ * @function getData
+ * @description Performs the data query and processing.
+ * @async
+ *
+ * @returns {Object} Returns object described in the provider documentation.
+ *
+ * @see apis/README.md
+ */
+async function getData() {
+    const responses = await getAllStations();
+
+    let {stations, maxPricesByType} = mergePrices(responses);
 
     stations.forEach(station => fillMissingPrices(station, maxPricesByType));
 

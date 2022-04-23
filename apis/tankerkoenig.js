@@ -106,10 +106,12 @@ function sortByDistance(a, b) {
  * @returns {boolean} To keep or filter the station.
  */
 function filterStations(station) {
-    for (let i = 0; i < config.types.length; i += 1) {
-        if (station[config.types[i]] <= 0 || config.showOpenOnly && !station.isOpen || config.excludeStationIds.includes(station.id)) {
-            return false;
-        }
+    const hideClosedStation = config.showOpenOnly && !station.isOpen;
+    const excludeStation = config.excludeStationIds.includes(station.id);
+    const noPriceAvailable = config.types.some(type => station[type] <= 0);
+
+    if (hideClosedStation || excludeStation || noPriceAvailable) {
+        return false;
     }
 
     return true;
