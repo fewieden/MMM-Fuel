@@ -93,11 +93,7 @@ function sortByPrice(a, b) {
         return isNaN(aPrice) ? 1 : -1;
     }
 
-    if (aPrice < bPrice) {
-        return -1;
-    }
-
-    return aPrice > bPrice ? 1 : 0;
+    return 0;
 }
 
 /**
@@ -114,7 +110,7 @@ async function fetchPaginatedStations(type, path) {
     let stations = [];
     let nextPage = 1;
 
-    while (nextPage !== -1 && nextPage <= MAX_PAGE) {
+    while (nextPage <= MAX_PAGE) {
         try {
             const pageSuffix = `/pg-${nextPage}`;
             const response = await fetch(`${BASE_URL}${path}${pageSuffix}`, {
@@ -129,9 +125,9 @@ async function fetchPaginatedStations(type, path) {
             const parsedStations = htmlStations.map(station => mapGasStation(station, type));
             stations = stations.concat(parsedStations);
 
-            nextPage = htmlStations.length === 10 ? nextPage + 1 : -1;
+            nextPage++;
         } catch (e) {
-            nextPage = -1;
+            break;
         }
     }
 
