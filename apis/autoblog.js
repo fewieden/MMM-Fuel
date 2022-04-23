@@ -63,17 +63,15 @@ function mapGasStation(htmlGasStation, type) {
  * @function fillMissingPrices
  * @description Replaces missing price information with max price for type.
  *
- * @param {Object[]} stations - Gas Stations
+ * @param {Object} station - Gas Station
  * @param {Object} maxPricesByType - Maximum price per fuel type.
  *
  * @returns {void}
  */
-function fillMissingPrices(stations, maxPricesByType) {
-    for (const station of stations) {
-        for (const type of config.types) {
-            if (!station.prices[type]) {
-                station.prices[type] = `>${maxPricesByType[type]}`;
-            }
+function fillMissingPrices(station, maxPricesByType) {
+    for (const type of config.types) {
+        if (!station.prices[type]) {
+            station.prices[type] = `>${maxPricesByType[type]}`;
         }
     }
 }
@@ -114,7 +112,7 @@ function sortByPrice(a, b) {
  * @param {string} type - Fuel type.
  * @param {string} path - URL path.
  *
- * @returns {Promise} Array with station.
+ * @returns {Promise} Object with type and stations.
  */
 async function fetchPaginatedStations(type, path) {
     let stations = [];
@@ -141,7 +139,32 @@ async function fetchPaginatedStations(type, path) {
         }
     }
 
+    stations.forEach(station => {
+        station.fuelType = type;
+    });
+
     return stations;
+}
+
+/**
+ * @function getAllStations
+ * @description Requests all station and fuel types as paginated requests.
+ * @async
+ *
+ * @returns {Object[]} Returns object described in the provider documentation.
+ */
+async function getAllStations() {
+    const promises = config.types.reduce((acc, type) => {
+        const paths = getRequestPaths(type);
+
+        paths.forEach(path => acc.push(fetchPaginatedStations(type, path)));
+
+        return acc;
+    }, []);
+
+    const responses = await Promise.all(promises);
+
+    return responses.flat();
 }
 
 /**
@@ -157,30 +180,24 @@ async function getData() {
     const maxPricesByType = {};
     const indexedStations = {};
 
-    for (const type of config.types) {
-        const paths = getRequestPaths(type);
+    const responses = await getAllStations();
 
-        for (const path of paths) {
-            const stations = await fetchPaginatedStations(type, path);
+    for (const station of responses) {
+        const stationKey = `${station.name}-${station.address}`;
+        if (!indexedStations[stationKey]) {
+            indexedStations[stationKey] = station;
+        } else {
+            indexedStations[stationKey].prices[station.fuelType] = station.prices[station.fuelType];
+        }
 
-            for (const station of stations) {
-                const stationKey = `${station.name}-${station.address}`;
-                if (!indexedStations[stationKey]) {
-                    indexedStations[stationKey] = station;
-                } else {
-                    indexedStations[stationKey].prices[type] = station.prices[type];
-                }
-
-                if (!maxPricesByType[type] || maxPricesByType[type] < station.prices[type]) {
-                    maxPricesByType[type] = station.prices[type];
-                }
-            }
+        if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
+            maxPricesByType[station.fuelType] = station.prices[station.fuelType];
         }
     }
 
     let stations = Object.values(indexedStations);
 
-    fillMissingPrices(stations, maxPricesByType);
+    stations.forEach(station => fillMissingPrices(station, maxPricesByType));
 
     stations = stations.filter(station => station.distance <= config.radius);
 
