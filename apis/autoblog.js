@@ -163,10 +163,12 @@ async function getAllStations() {
  * @function mergePrices
  * @description Merges fuel prices of different types of gas station
  *
+ * @param {Object[]} responses - List of gas stations with prices of single fuel type.
+ *
  * @returns {Object} Returns gas stations with merged prices and max prices per fuel type.
  */
 function mergePrices(responses) {
-    const {indexedStations, maxPricesByType} = responses.reduce(({indexedStations, maxPricesByType}, station) => {
+    const { indexedStations, maxPricesByType } = responses.reduce(({ indexedStations, maxPricesByType }, station) => {
         const stationKey = `${station.name}-${station.address}`;
 
         if (!indexedStations[stationKey]) {
@@ -179,10 +181,10 @@ function mergePrices(responses) {
             maxPricesByType[station.fuelType] = station.prices[station.fuelType];
         }
 
-        return {indexedStations, maxPricesByType};
-    }, {indexedStations: {}, maxPricesByType: {}});
+        return { indexedStations, maxPricesByType };
+    }, { indexedStations: {}, maxPricesByType: {} });
 
-    return {stations: Object.values(indexedStations), maxPricesByType};
+    return { stations: Object.values(indexedStations), maxPricesByType };
 }
 
 /**
@@ -197,13 +199,13 @@ function mergePrices(responses) {
 async function getData() {
     const responses = await getAllStations();
 
-    let {stations, maxPricesByType} = mergePrices(responses);
+    const { stations, maxPricesByType } = mergePrices(responses);
 
     stations.forEach(station => fillMissingPrices(station, maxPricesByType));
 
-    stations = stations.filter(station => station.distance <= config.radius);
+    const filteredStations = stations.filter(station => station.distance <= config.radius);
 
-    const stationsSortedByDistance = stations.sort((a, b) => a.distance - b.distance);
+    const stationsSortedByDistance = filteredStations.sort((a, b) => a.distance - b.distance);
     const stationsSortedByPrice = [...stationsSortedByDistance].sort(sortByPrice);
 
     return {
