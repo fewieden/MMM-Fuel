@@ -293,8 +293,8 @@ async function getPricesByStationList(stationsByRadius) {
     for (const [stationId, info] of Object.entries(parsedResponse.prices)) {
         stations.push({
             ...stationInfos[stationId],
-            isOpen: info.status !== 'closed',
-            prices: getPricing(info)
+            ...getPricing(info),
+            isOpen: info.status !== 'closed'
         });
     }
 
