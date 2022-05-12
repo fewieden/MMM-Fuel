@@ -1,16 +1,10 @@
 # MMM-Fuel Changelog
 
-## [Unreleased]
+## [2.3.1]
 
 ### Fixed
 
 * Tankerkoenig prices for requests with `stationIds`
-
-### Added
-
-### Changed
-
-### Removed
 
 ## [2.3.0]
 
