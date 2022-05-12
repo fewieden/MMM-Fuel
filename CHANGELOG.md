@@ -1,5 +1,11 @@
 # MMM-Fuel Changelog
 
+## [2.3.1]
+
+### Fixed
+
+* Tankerkoenig prices for requests with `stationIds`
+
 ## [2.3.0]
 
 MagicMirror² version >= 2.15.0 required.
