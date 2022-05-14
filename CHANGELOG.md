@@ -1,5 +1,15 @@
 # MMM-Fuel Changelog
 
+## [Unreleased]
+
+### Fixed
+
+### Added
+
+### Changed
+
+### Removed
+
 ## [2.3.1]
 
 ### Fixed
