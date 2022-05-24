@@ -6,6 +6,8 @@
 
 ### Added
 
+* Config option: `fade`
+
 ### Changed
 
 ### Removed

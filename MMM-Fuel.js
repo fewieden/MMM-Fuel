@@ -61,6 +61,7 @@ Module.register('MMM-Fuel', {
      * @property {int} updateInterval - Speed of update.
      * @property {string} provider - API provider of the data.
      * @property {boolean} toFixed - Flag to show price with only 2 decimals.
+     * @property {boolean} fade - Fade the list of gas stations.
      */
     defaults: {
         radius: 5,
@@ -85,7 +86,8 @@ Module.register('MMM-Fuel', {
         provider: 'tankerkoenig',
         toFixed: false,
         stationIds: [],
-        excludeStationIds: []
+        excludeStationIds: [],
+        fade: true
     },
 
     /**
@@ -430,5 +432,14 @@ Module.register('MMM-Fuel', {
             unit: this.priceList.unit,
             maximumFractionDigits: 1
         }).format(distance));
+        this.nunjucksEnvironment().addFilter('fade', (index, total) => {
+            if (this.config.fade) {
+                const percentage = (1 - 1 / total * index).toFixed(2);
+
+                return `opacity: ${percentage}`;
+            }
+
+            return '';
+        });
     }
 });
