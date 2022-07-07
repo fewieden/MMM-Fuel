@@ -29,7 +29,7 @@
     "stylelint-config-standard": "^25.0.0"
   },
   "dependencies": {
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "node-html-parser": "^5.3.3"
   }
