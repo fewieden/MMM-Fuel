@@ -1,5 +1,9 @@
 # MMM-Fuel Changelog
+## [2.3.2]
 
+### Added
+
+* Provider: GasBuddy
 ## [2.3.1]
 
 ### Fixed

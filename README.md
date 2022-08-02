@@ -116,6 +116,23 @@ No API key required. The displayed distance is not based on your coordinates but
 | `showOpenOnly` | `false` | Not supported |
 | `showBrand` | `false` | Not supported |
 
+### gasbuddy (USA only)
+
+No API key required. The displayed distance is not based on your coordinates but on the zip code.
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `provider` | `"tankerkoenig"` | Make sure you set it to `"gasbuddy"`. |
+| `zip` | REQUIRED | The zip code of your address, e.g. `"12345"` |
+| `types` | `["regular"]` | Valid options are `regular`, `midgrade`, `premium`, `diesel`, `e85`, and `unl88`. |
+| `showDistance` | `false` | Not supported |
+| `radius` | `5` | Not supported |
+| `lat` | `undefined` | Not supported |
+| `lng` | `undefined` | Not supported |
+| `open` | `false` | Not supported |
+| `showOpenOnly` | `false` | Not supported |
+| `showBrand` | `false` | Not supported |
+
 ### nsw (Australia NSW only)
 
 This provider gives no information if the gas stations are open or closed.
