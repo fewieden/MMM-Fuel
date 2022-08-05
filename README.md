@@ -117,7 +117,7 @@ No API key required. The displayed distance is not based on your coordinates but
 | `showOpenOnly` | `false` | Not supported |
 | `showBrand` | `false` | Not supported |
 
-### nsw (Australia NSW only)
+### nsw (Australia NSW and TAS only)
 
 This provider gives no information if the gas stations are open or closed.
 Config options should be set accordingly `open`: false and `showOpenOnly`: false.
