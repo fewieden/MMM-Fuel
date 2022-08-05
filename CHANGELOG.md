@@ -10,6 +10,8 @@
 
 ### Changed
 
+* Migrated provider `nsw` from API v1 to v2 in order to support new region Tasmania (Australia)
+
 ### Removed
 
 ## [2.3.1]
