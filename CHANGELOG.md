@@ -3,7 +3,7 @@
 
 ### Added
 
-* Provider: GasBuddy
+* Provider: gasbuddy
 ## [2.3.1]
 
 ### Fixed

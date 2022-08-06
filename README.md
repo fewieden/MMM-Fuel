@@ -116,7 +116,7 @@ No API key required. The displayed distance is not based on your coordinates but
 | `showOpenOnly` | `false` | Not supported |
 | `showBrand` | `false` | Not supported |
 
-### gasbuddy (USA only)
+### gasbuddy (USA and Canada only)
 
 No API key required. The displayed distance is not based on your coordinates but on the zip code.
 

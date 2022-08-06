@@ -20,41 +20,28 @@ const fetch = require('node-fetch');
 const { parse } = require('node-html-parser');
 
 const BASE_URL = 'https://www.gasbuddy.com';
-const MAX_PAGE = 1;
+const TYPES = {
+    regular: 1,
+    midgrade: 2,
+    premium: 3,
+    diesel: 4,
+    e85: 5,
+    unl88: 12
+};
 
 let config;
 
 /**
- * @function getRequestPaths
+ * @function getRequestPath
+ *
  * @description URL paths for fuel type to request data sorted by distance and by price.
  *
  * @param {string} type - Fuel type.
  *
  * @returns {string[]} URL paths for fuel type.
  */
-function getRequestPaths(type) {
-    switch(type) {
-        case 'midgrade':
-          type = '2';
-          break;
-        case 'premium':
-          type = '3';
-          break;
-        case 'diesel':
-           type = '4';
-           break;
-        case 'e85':
-           type = '5';
-           break;
-        case 'unl88':
-            type = '12';
-            break;
-        default:
-          type = '1';
-      }
-    return [
-        `/home?search=${config.zip}&fuel=${type}&maxAge=0&method=all`
-    ];
+function getRequestPath(type) {
+    return `/home?search=${config.zip}&fuel=${TYPES[type]}&maxAge=0&method=all`;
 }
 
 /**
@@ -126,29 +113,25 @@ function sortByPrice(a, b) {
  */
 async function fetchPaginatedStations(type, path) {
     let stations = [];
-    let nextPage = 1;
+    try {
+        const response = await fetch(`${BASE_URL}${path}`, {
+             headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36',
+            }
+        });
+        const html = await response.text();
+        const parsedHtml = parse(html);
 
-    while (nextPage <= MAX_PAGE) {
-        try {
-            const response = await fetch(`${BASE_URL}${path}`, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36',
-                }
-            });
-            const html = await response.text();
-            const parsedHtml = parse(html);
+        const htmlStations = parsedHtml.querySelectorAll('[class*=GenericStationListItem-module__stationListItem___]');
 
-            const htmlStations = parsedHtml.querySelectorAll('[class*=GenericStationListItem-module__stationListItem___]');
+        const parsedStations = htmlStations.map(station => mapGasStation(station, type));
 
-            const parsedStations = htmlStations.map(station => mapGasStation(station, type));
+        stations = stations.concat(parsedStations);
 
-             stations = stations.concat(parsedStations);
-
-            nextPage++;
+            
         } catch (e) {
-            break;
+            
         }
-    }
 
     stations.forEach(station => {
         station.fuelType = type;
@@ -166,8 +149,9 @@ async function fetchPaginatedStations(type, path) {
  */
 async function getAllStations() {
     const promises = config.types.reduce((acc, type) => {
-        const paths = getRequestPaths(type);
-        paths.forEach(path => acc.push(fetchPaginatedStations(type, path)));
+        const path = getRequestPath(type);
+
+        acc.push(fetchPaginatedStations(type, path));
         return acc;
     }, []);
 
@@ -220,10 +204,10 @@ async function getData() {
 
     stations.forEach(station => fillMissingPrices(station, maxPricesByType));
 
-    const filteredStations = stations.filter(station => station.distance <= config.radius);
+    // Webpage doesn't support distance (only zip code).
+    const stationsSortedByPrice = stations.sort(sortByPrice);
+    const stationsSortedByDistance = stationsSortedByPrice;
 
-    const stationsSortedByDistance = filteredStations.sort((a, b) => a.distance - b.distance);
-    const stationsSortedByPrice = [...stationsSortedByDistance].sort(sortByPrice);
     return {
         types: ['regular', 'midgrade', 'premium', 'diesel', 'e85', 'unl88'],
         unit: 'mile',
@@ -241,8 +225,6 @@ async function getData() {
  * @requires external:node-html-parser
  *
  * @param {Object} options - Configuration.
- * TODO: Convert this from radius to lastupdated or something.
- * @param {int} options.radius - Lookup area for gas stations.
  * @param {string} options.zip - Zip code of address.
  * @param {string} options.sortBy - Type to sort by price.
  * @param {string[]} options.types - Requested fuel types.
