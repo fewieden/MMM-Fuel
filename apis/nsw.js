@@ -148,7 +148,7 @@ async function getData() {
  * @returns {Promise} Object with fuel type and data.
  */
 async function requestFuelType(type) {
-    const response = await fetch(`${BASE_URL}/FuelPriceCheck/v1/fuel/prices/nearby`, {
+    const response = await fetch(`${BASE_URL}/FuelPriceCheck/v2/fuel/prices/nearby`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -160,11 +160,11 @@ async function requestFuelType(type) {
         },
         body: JSON.stringify({
             fueltype: TYPES[type],
-            latitude: config.lat,
-            longitude: config.lng,
-            radius: config.radius,
-            sortby: 'price',
-            sortascending: true
+            latitude: `${config.lat}`,
+            longitude: `${config.lng}`,
+            radius: `${config.radius}`,
+            sortby: 'Price',
+            sortascending: 'true'
         })
     });
 

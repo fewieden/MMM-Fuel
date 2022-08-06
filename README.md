@@ -64,6 +64,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
 | `updateInterval` | `900000` (15 mins) | How often should the data be fetched. **If your value is to small, you risk to get banned from the API provider. I suggest a minimum of 15mins** |
+| `fade` | `true` | Boolean to fade out the list of gas stations. |
 
 ## Global config
 
@@ -116,6 +117,7 @@ No API key required. The displayed distance is not based on your coordinates but
 | `showOpenOnly` | `false` | Not supported |
 | `showBrand` | `false` | Not supported |
 
+
 ### gasbuddy (USA and Canada only)
 
 No API key required. The displayed distance is not based on your coordinates but on the zip code.
@@ -133,7 +135,8 @@ No API key required. The displayed distance is not based on your coordinates but
 | `showOpenOnly` | `false` | Not supported |
 | `showBrand` | `false` | Not supported |
 
-### nsw (Australia NSW only)
+
+### nsw (Australia NSW and TAS only)
 
 This provider gives no information if the gas stations are open or closed.
 Config options should be set accordingly `open`: false and `showOpenOnly`: false.
