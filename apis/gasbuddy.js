@@ -19,6 +19,12 @@ const fetch = require('node-fetch');
  */
 const { parse } = require('node-html-parser');
 
+/**
+ * @external logger
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
+ */
+const Log = require('logger');
+
 const BASE_URL = 'https://www.gasbuddy.com';
 const TYPES = {
     regular: 1,
@@ -34,11 +40,11 @@ let config;
 /**
  * @function getRequestPath
  *
- * @description URL paths for fuel type to request data sorted by distance and by price.
+ * @description URL path for fuel type to request data.
  *
  * @param {string} type - Fuel type.
  *
- * @returns {string[]} URL paths for fuel type.
+ * @returns {string} URL path for fuel type.
  */
 function getRequestPath(type) {
     return `/home?search=${config.zip}&fuel=${TYPES[type]}&maxAge=0&method=all`;
@@ -55,9 +61,9 @@ function getRequestPath(type) {
  */
 function mapGasStation(htmlGasStation, type) {
     return {
-        name: htmlGasStation.querySelector('[class*=header__header3___] a[href*=station]').innerHTML,
+        name: htmlGasStation.querySelector('[class*=header__header3___] a[href*=station]').text,
         address: htmlGasStation.querySelector('[class*=StationDisplay-module__address___]').innerHTML.replace('<br>', ' '),
-        prices: { [type]: parseFloat(htmlGasStation.querySelector('[class*=StationDisplayPrice-module__price___]').innerHTML.replace('$', '')) },
+        prices: { [type]: parseFloat(htmlGasStation.querySelector('[class*=StationDisplayPrice-module__price___]').text.replace('$', '')) },
         distance: 0,
         stationId: htmlGasStation.querySelector('[class*=header__header3___] a[href*=station]').rawAttributes.href.replace('/station/', '')
     };
@@ -102,20 +108,20 @@ function sortByPrice(a, b) {
 }
 
 /**
- * @function fetchPaginatedStations
- * @description Paginated API requests for specified type.
+ * @function fetchStations
+ * @description API requests for specified type.
  * @async
  *
  * @param {string} type - Fuel type.
  * @param {string} path - URL path.
  *
- * @returns {Promise} Object with type and stations.
+ * @returns {Promise} Array with stations including fuelType.
  */
-async function fetchPaginatedStations(type, path) {
+async function fetchStations(type, path) {
     let stations = [];
     try {
         const response = await fetch(`${BASE_URL}${path}`, {
-             headers: {
+            headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36',
             }
         });
@@ -127,11 +133,9 @@ async function fetchPaginatedStations(type, path) {
         const parsedStations = htmlStations.map(station => mapGasStation(station, type));
 
         stations = stations.concat(parsedStations);
-
-            
-        } catch (e) {
-            
-        }
+    } catch (error) {
+        Log.error(`MMM-Fuel: Failed to fetch stations for type ${type}`, error);
+    }
 
     stations.forEach(station => {
         station.fuelType = type;
@@ -142,7 +146,7 @@ async function fetchPaginatedStations(type, path) {
 
 /**
  * @function getAllStations
- * @description Requests all station and fuel types as paginated requests.
+ * @description Requests all stations and fuel types.
  * @async
  *
  * @returns {Object[]} Returns object described in the provider documentation.
@@ -151,7 +155,7 @@ async function getAllStations() {
     const promises = config.types.reduce((acc, type) => {
         const path = getRequestPath(type);
 
-        acc.push(fetchPaginatedStations(type, path));
+        acc.push(fetchStations(type, path));
         return acc;
     }, []);
 
@@ -170,12 +174,10 @@ async function getAllStations() {
  */
 function mergePrices(responses) {
     const { indexedStations, maxPricesByType } = responses.reduce(({ indexedStations, maxPricesByType }, station) => {
-        const stationKey = `${station.name}-${station.address}`;
-
-        if (!indexedStations[stationKey]) {
-            indexedStations[stationKey] = station;
+        if (!indexedStations[station.stationId]) {
+            indexedStations[station.stationId] = station;
         } else {
-            indexedStations[stationKey].prices[station.fuelType] = station.prices[station.fuelType];
+            indexedStations[station.stationId].prices[station.fuelType] = station.prices[station.fuelType];
         }
 
         if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
@@ -223,6 +225,7 @@ async function getData() {
  *
  * @requires external:node-fetch
  * @requires external:node-html-parser
+ * @requires external:logger
  *
  * @param {Object} options - Configuration.
  * @param {string} options.zip - Zip code of address.
