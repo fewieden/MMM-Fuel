@@ -6,6 +6,7 @@
 
 ### Added
 
+* Provider: `gasbuddy`
 * Config option: `fade`
 
 ### Changed
