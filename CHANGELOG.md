@@ -13,8 +13,6 @@
 * [Migrated provider `nsw` from API v1 to v2 in order to support new region Tasmania (Australia)](https://github.com/fewieden/MMM-Fuel/issues/68#issuecomment-916505199)
 * Dependency update
 
-### Removed
-
 ## [2.3.1]
 
 ### Fixed
