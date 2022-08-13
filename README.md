@@ -57,7 +57,6 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `colored` | `false` | Boolean to show the gas stations map colored or not. |
 | `shortenText` | `false` | Integer of characters to be shown for name and address. Default shows all. |
 | `showAddress` | `true` | Boolean to show the gas station's address. |
-| `showAddressCity` | `true` | Boolean to show the gas station's city. |
 | `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
 | `showDistance` | `true` | Boolean to show the distance to your specified position. |
 | `showBrand` | `false` | Boolean to show the brand instead of the name. |
@@ -87,6 +86,7 @@ or your API access will be suspended.
 | `api_key` | REQUIRED | Get an API key for free access to the data of [tankerkoenig.de](https://creativecommons.tankerkoenig.de/#register). |
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `e10`. |
 | `radius` | `5` | Valid range is 0-25. Set to 0 to disable. Not required if `stationIds` are provided. |
+| `showAddressCity` | `true` | Boolean to show the gas station's city. |
 | `stationIds` | `[]` | Optional array of fuel station ids to fetch instead of the radius. You can only specify a maximum of 10 and you can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html). Using radius and station ids in parallel will result in more API calls. If you run into issues increase the `updateInterval`. |
 | `excludeStationIds` | `[]` | Optional array of fuel station ids to exclude from the radius. This is useful e.g. if you got a non public or truck exclusive station in the radius. You can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html).|
 
@@ -100,6 +100,7 @@ No API key required.
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `gas`. |
 | `radius` | `5` | Valid range not tested yet. |
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
+| `showAddressCity` | `true` | Boolean to show the gas station's city. |
 | `showBrand` | `false` | The API provider does not return brand information. |
 
 ### autoblog (USA only)
