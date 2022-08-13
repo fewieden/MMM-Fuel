@@ -1,18 +1,16 @@
 # MMM-Fuel Changelog
 
-## [Unreleased]
-
-### Fixed
+## [2.4.0]
 
 ### Added
 
-* Provider: `gasbuddy`
-* Config option: `fade`
-* Config option: `showAddressCity`
+* [Provider: `gasbuddy`](https://github.com/fewieden/MMM-Fuel/pull/97)
+* [Config option: `fade`](https://github.com/fewieden/MMM-Fuel/issues/7)
+* [Config option: `showAddressCity`](https://github.com/fewieden/MMM-Fuel/pull/64)
 
 ### Changed
 
-* Migrated provider `nsw` from API v1 to v2 in order to support new region Tasmania (Australia)
+* [Migrated provider `nsw` from API v1 to v2 in order to support new region Tasmania (Australia)](https://github.com/fewieden/MMM-Fuel/issues/68#issuecomment-916505199)
 * Dependency update
 
 ### Removed
