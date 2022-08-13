@@ -72,12 +72,42 @@ function sortByPrice(config, a, b) {
 }
 
 /**
+ * @function mergePrices
+ * @description Merges fuel prices of different types of gas station
+ *
+ * @param {Object[]} responses - List of gas stations with prices of single fuel type.
+ * @param {function} getStationKeyFunc - Helper to retrieve unique station key.
+ *
+ * @returns {Object} Returns gas stations with merged prices and max prices per fuel type.
+ */
+function mergePrices(responses, getStationKeyFunc) {
+    const { indexedStations, maxPricesByType } = responses.reduce(({ indexedStations, maxPricesByType }, station) => {
+        const stationKey = getStationKeyFunc(station);
+
+        if (!indexedStations[stationKey]) {
+            indexedStations[stationKey] = station;
+        } else {
+            indexedStations[stationKey].prices[station.fuelType] = station.prices[station.fuelType];
+        }
+
+        if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
+            maxPricesByType[station.fuelType] = station.prices[station.fuelType];
+        }
+
+        return { indexedStations, maxPricesByType };
+    }, { indexedStations: {}, maxPricesByType: {} });
+
+    return { stations: Object.values(indexedStations), maxPricesByType };
+}
+
+/**
  * @module apis/utils
  * @description Utility functions for API integrations.
  */
 module.exports = {
     fillMissingPrices,
     filterStations,
+    mergePrices,
     sortByDistance,
     sortByPrice
 };

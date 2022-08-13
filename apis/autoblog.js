@@ -19,7 +19,7 @@ const fetch = require('node-fetch');
  */
 const { parse } = require('node-html-parser');
 
-const { fillMissingPrices, sortByDistance, sortByPrice } = require('./utils');
+const { fillMissingPrices, sortByDistance, sortByPrice, mergePrices } = require('./utils');
 
 const BASE_URL = 'https://www.autoblog.com';
 const MAX_PAGE = 2;
@@ -125,31 +125,17 @@ async function getAllStations() {
 }
 
 /**
- * @function mergePrices
- * @description Merges fuel prices of different types of gas station
+ * @function getStationKey
+ * @description Helper to retrieve unique station key.
  *
- * @param {Object[]} responses - List of gas stations with prices of single fuel type.
+ * @param {Object} station - Station
  *
- * @returns {Object} Returns gas stations with merged prices and max prices per fuel type.
+ * @returns {string} Returns unique station key.
+ *
+ * @see apis/README.md
  */
-function mergePrices(responses) {
-    const { indexedStations, maxPricesByType } = responses.reduce(({ indexedStations, maxPricesByType }, station) => {
-        const stationKey = `${station.name}-${station.address}`;
-
-        if (!indexedStations[stationKey]) {
-            indexedStations[stationKey] = station;
-        } else {
-            indexedStations[stationKey].prices[station.fuelType] = station.prices[station.fuelType];
-        }
-
-        if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
-            maxPricesByType[station.fuelType] = station.prices[station.fuelType];
-        }
-
-        return { indexedStations, maxPricesByType };
-    }, { indexedStations: {}, maxPricesByType: {} });
-
-    return { stations: Object.values(indexedStations), maxPricesByType };
+function getStationKey(station) {
+    return `${station.name}-${station.address}`;
 }
 
 /**
@@ -164,7 +150,7 @@ function mergePrices(responses) {
 async function getData() {
     const responses = await getAllStations();
 
-    const { stations, maxPricesByType } = mergePrices(responses);
+    const { stations, maxPricesByType } = mergePrices(responses, getStationKey);
 
     stations.forEach(station => fillMissingPrices(config, station, maxPricesByType));
 

@@ -25,7 +25,7 @@ const { parse } = require('node-html-parser');
  */
 const Log = require('logger');
 
-const { fillMissingPrices, sortByPrice } = require('./utils');
+const { fillMissingPrices, mergePrices, sortByPrice } = require('./utils');
 
 const BASE_URL = 'https://www.gasbuddy.com';
 const TYPES = {
@@ -130,29 +130,17 @@ async function getAllStations() {
 }
 
 /**
- * @function mergePrices
- * @description Merges fuel prices of different types of gas station
+ * @function getStationKey
+ * @description Helper to retrieve unique station key.
  *
- * @param {Object[]} responses - List of gas stations with prices of single fuel type.
+ * @param {Object} station - Station
  *
- * @returns {Object} Returns gas stations with merged prices and max prices per fuel type.
+ * @returns {string} Returns unique station key.
+ *
+ * @see apis/README.md
  */
-function mergePrices(responses) {
-    const { indexedStations, maxPricesByType } = responses.reduce(({ indexedStations, maxPricesByType }, station) => {
-        if (!indexedStations[station.stationId]) {
-            indexedStations[station.stationId] = station;
-        } else {
-            indexedStations[station.stationId].prices[station.fuelType] = station.prices[station.fuelType];
-        }
-
-        if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
-            maxPricesByType[station.fuelType] = station.prices[station.fuelType];
-        }
-
-        return { indexedStations, maxPricesByType };
-    }, { indexedStations: {}, maxPricesByType: {} });
-
-    return { stations: Object.values(indexedStations), maxPricesByType };
+function getStationKey(station) {
+    return station.stationId;
 }
 
 /**
@@ -167,7 +155,7 @@ function mergePrices(responses) {
 async function getData() {
     const responses = await getAllStations();
 
-    const { stations, maxPricesByType } = mergePrices(responses);
+    const { stations, maxPricesByType } = mergePrices(responses, getStationKey);
 
     stations.forEach(station => fillMissingPrices(config, station, maxPricesByType));
 
