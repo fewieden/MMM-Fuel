@@ -49,7 +49,8 @@ Module.register('MMM-Fuel', {
      * @property {boolean} colored - Flag to render map in colour or greyscale.
      * @property {boolean} open - Flag to render column to indicate if the gas stations are open or closed.
      * @property {boolean|int} shortenText - Max characters to be shown for name and address.
-     * @property {boolean} showAddress - Flag to show the gas stations address.
+     * @property {boolean} showAddress - Flag to show the gas station's address.
+     * @property {boolean} showAddressCity - Flag to show the gas station's city.
      * @property {boolean} showOpenOnly - Flag to show only open gas stations or all.
      * @property {boolean} showDistance - Flag to show the distance to your specified position.
      * @property {boolean} showBrand - Flag to show the brand instead of the name.
@@ -74,6 +75,7 @@ Module.register('MMM-Fuel', {
         open: false,
         shortenText: false,
         showAddress: true,
+        showAddressCity: true,
         showOpenOnly: false,
         showDistance: true,
         showBrand: false,

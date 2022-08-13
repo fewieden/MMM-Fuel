@@ -56,7 +56,8 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `width` | `600` | Width of the map in pixel. |
 | `colored` | `false` | Boolean to show the gas stations map colored or not. |
 | `shortenText` | `false` | Integer of characters to be shown for name and address. Default shows all. |
-| `showAddress` | `true` | Boolean to show the gas stations address. |
+| `showAddress` | `true` | Boolean to show the gas station's address. |
+| `showAddressCity` | `true` | Boolean to show the gas station's city. |
 | `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
 | `showDistance` | `true` | Boolean to show the distance to your specified position. |
 | `showBrand` | `false` | Boolean to show the brand instead of the name. |
