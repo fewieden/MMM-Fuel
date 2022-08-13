@@ -8,10 +8,12 @@
 
 * Provider: `gasbuddy`
 * Config option: `fade`
+* Config option: `showAddressCity`
 
 ### Changed
 
 * Migrated provider `nsw` from API v1 to v2 in order to support new region Tasmania (Australia)
+* Dependency update
 
 ### Removed
 

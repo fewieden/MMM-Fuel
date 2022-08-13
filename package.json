@@ -24,13 +24,13 @@
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-recommended": "^4.1.0",
-    "jsdoc": "^3.6.10",
-    "stylelint": "^14.6.0",
-    "stylelint-config-standard": "^25.0.0"
+    "jsdoc": "^3.6.11",
+    "stylelint": "^14.10.0",
+    "stylelint-config-standard": "^27.0.0"
   },
   "dependencies": {
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
-    "node-html-parser": "^5.3.3"
+    "node-html-parser": "^5.4.1"
   }
 }
