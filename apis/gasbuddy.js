@@ -25,6 +25,8 @@ const { parse } = require('node-html-parser');
  */
 const Log = require('logger');
 
+const { fillMissingPrices, sortByPrice } = require('./utils');
+
 const BASE_URL = 'https://www.gasbuddy.com';
 const TYPES = {
     regular: 1,
@@ -68,43 +70,6 @@ function mapGasStation(htmlGasStation, type) {
         stationId: htmlGasStation.querySelector('[class*=header__header3___] a[href*=station]').rawAttributes.href.replace('/station/', '')
     };
 
-}
-
-/**
- * @function fillMissingPrices
- * @description Replaces missing price information with max price for type.
- *
- * @param {Object} station - Gas Station
- * @param {Object} maxPricesByType - Maximum price per fuel type.
- *
- * @returns {void}
- */
-function fillMissingPrices(station, maxPricesByType) {
-    for (const type of config.types) {
-        if (!station.prices[type]) {
-            station.prices[type] = `>${maxPricesByType[type]}`;
-        }
-    }
-}
-
-/**
- * @function sortByPrice
- * @description Helper function to sort gas stations by price.
- *
- * @param {Object} a - Gas Station
- * @param {Object} b - Gas Station
- *
- * @returns {number} Sorting weight.
- */
-function sortByPrice(a, b) {
-    const aPrice = a.prices[config.sortBy];
-    const bPrice = b.prices[config.sortBy];
-
-    if (!isNaN(aPrice) || !isNaN(bPrice)) {
-        return isNaN(aPrice) ? -1 : 1;
-    }
-
-    return 0;
 }
 
 /**
@@ -204,10 +169,10 @@ async function getData() {
 
     const { stations, maxPricesByType } = mergePrices(responses);
 
-    stations.forEach(station => fillMissingPrices(station, maxPricesByType));
+    stations.forEach(station => fillMissingPrices(config, station, maxPricesByType));
 
     // Webpage doesn't support distance (only zip code).
-    const stationsSortedByPrice = stations.sort(sortByPrice);
+    const stationsSortedByPrice = stations.sort(sortByPrice.bind(null, config));
     const stationsSortedByDistance = stationsSortedByPrice;
 
     return {
