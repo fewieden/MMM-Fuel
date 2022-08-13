@@ -19,6 +19,8 @@ const fetch = require('node-fetch');
  */
 const { parse } = require('node-html-parser');
 
+const { fillMissingPrices, sortByDistance, sortByPrice, mergePrices } = require('./utils');
+
 const BASE_URL = 'https://www.autoblog.com';
 const MAX_PAGE = 2;
 
@@ -57,43 +59,6 @@ function mapGasStation(htmlGasStation, type) {
         prices: { [type]: parseFloat(htmlGasStation.querySelector('li.price data.price').getAttribute('value')) },
         distance: parseFloat(htmlGasStation.querySelector('li.dist data.distance').getAttribute('value')),
     };
-}
-
-/**
- * @function fillMissingPrices
- * @description Replaces missing price information with max price for type.
- *
- * @param {Object} station - Gas Station
- * @param {Object} maxPricesByType - Maximum price per fuel type.
- *
- * @returns {void}
- */
-function fillMissingPrices(station, maxPricesByType) {
-    for (const type of config.types) {
-        if (!station.prices[type]) {
-            station.prices[type] = `>${maxPricesByType[type]}`;
-        }
-    }
-}
-
-/**
- * @function sortByPrice
- * @description Helper function to sort gas stations by price.
- *
- * @param {Object} a - Gas Station
- * @param {Object} b - Gas Station
- *
- * @returns {number} Sorting weight.
- */
-function sortByPrice(a, b) {
-    const aPrice = a.prices[config.sortBy];
-    const bPrice = b.prices[config.sortBy];
-
-    if (!isNaN(aPrice) || !isNaN(bPrice)) {
-        return isNaN(aPrice) ? 1 : -1;
-    }
-
-    return 0;
 }
 
 /**
@@ -160,31 +125,17 @@ async function getAllStations() {
 }
 
 /**
- * @function mergePrices
- * @description Merges fuel prices of different types of gas station
+ * @function getStationKey
+ * @description Helper to retrieve unique station key.
  *
- * @param {Object[]} responses - List of gas stations with prices of single fuel type.
+ * @param {Object} station - Station
  *
- * @returns {Object} Returns gas stations with merged prices and max prices per fuel type.
+ * @returns {string} Returns unique station key.
+ *
+ * @see apis/README.md
  */
-function mergePrices(responses) {
-    const { indexedStations, maxPricesByType } = responses.reduce(({ indexedStations, maxPricesByType }, station) => {
-        const stationKey = `${station.name}-${station.address}`;
-
-        if (!indexedStations[stationKey]) {
-            indexedStations[stationKey] = station;
-        } else {
-            indexedStations[stationKey].prices[station.fuelType] = station.prices[station.fuelType];
-        }
-
-        if (!maxPricesByType[station.fuelType] || maxPricesByType[station.fuelType] < station.prices[station.fuelType]) {
-            maxPricesByType[station.fuelType] = station.prices[station.fuelType];
-        }
-
-        return { indexedStations, maxPricesByType };
-    }, { indexedStations: {}, maxPricesByType: {} });
-
-    return { stations: Object.values(indexedStations), maxPricesByType };
+function getStationKey(station) {
+    return `${station.name}-${station.address}`;
 }
 
 /**
@@ -199,14 +150,14 @@ function mergePrices(responses) {
 async function getData() {
     const responses = await getAllStations();
 
-    const { stations, maxPricesByType } = mergePrices(responses);
+    const { stations, maxPricesByType } = mergePrices(responses, getStationKey);
 
-    stations.forEach(station => fillMissingPrices(station, maxPricesByType));
+    stations.forEach(station => fillMissingPrices(config, station, maxPricesByType));
 
     const filteredStations = stations.filter(station => station.distance <= config.radius);
 
-    const stationsSortedByDistance = filteredStations.sort((a, b) => a.distance - b.distance);
-    const stationsSortedByPrice = [...stationsSortedByDistance].sort(sortByPrice);
+    const stationsSortedByDistance = filteredStations.sort(sortByDistance);
+    const stationsSortedByPrice = [...stationsSortedByDistance].sort(sortByPrice.bind(null, config));
 
     return {
         types: ['regular', 'premium', 'mid-grade', 'diesel'],

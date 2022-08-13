@@ -56,7 +56,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `width` | `600` | Width of the map in pixel. |
 | `colored` | `false` | Boolean to show the gas stations map colored or not. |
 | `shortenText` | `false` | Integer of characters to be shown for name and address. Default shows all. |
-| `showAddress` | `true` | Boolean to show the gas stations address. |
+| `showAddress` | `true` | Boolean to show the gas station's address. |
 | `showOpenOnly` | `false` | Boolean to show only open gas stations or all. |
 | `showDistance` | `true` | Boolean to show the distance to your specified position. |
 | `showBrand` | `false` | Boolean to show the brand instead of the name. |
@@ -64,6 +64,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `rotate` | `true` | Boolean to enable/disable rotation between sort by price and distance. |
 | `rotateInterval` | `60000` (1 min) | How fast the sorting should be switched between byPrice and byDistance. |
 | `updateInterval` | `900000` (15 mins) | How often should the data be fetched. **If your value is to small, you risk to get banned from the API provider. I suggest a minimum of 15mins** |
+| `fade` | `true` | Boolean to fade out the list of gas stations. |
 
 ## Global config
 
@@ -85,6 +86,7 @@ or your API access will be suspended.
 | `api_key` | REQUIRED | Get an API key for free access to the data of [tankerkoenig.de](https://creativecommons.tankerkoenig.de/#register). |
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `e10`. |
 | `radius` | `5` | Valid range is 0-25. Set to 0 to disable. Not required if `stationIds` are provided. |
+| `showAddressCity` | `true` | Boolean to show the gas station's city. |
 | `stationIds` | `[]` | Optional array of fuel station ids to fetch instead of the radius. You can only specify a maximum of 10 and you can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html). Using radius and station ids in parallel will result in more API calls. If you run into issues increase the `updateInterval`. |
 | `excludeStationIds` | `[]` | Optional array of fuel station ids to exclude from the radius. This is useful e.g. if you got a non public or truck exclusive station in the radius. You can find the ids [here](https://creativecommons.tankerkoenig.de/TankstellenFinder/index.html).|
 
@@ -98,6 +100,7 @@ No API key required.
 | `types` | `["diesel"]` | Valid options are `diesel`, `e5` and `gas`. |
 | `radius` | `5` | Valid range not tested yet. |
 | `max` | `5` | The API provider returns maximum of 5 valid datasets. |
+| `showAddressCity` | `true` | Boolean to show the gas station's city. |
 | `showBrand` | `false` | The API provider does not return brand information. |
 
 ### autoblog (USA only)
@@ -116,7 +119,24 @@ No API key required. The displayed distance is not based on your coordinates but
 | `showOpenOnly` | `false` | Not supported |
 | `showBrand` | `false` | Not supported |
 
-### nsw (Australia NSW only)
+### gasbuddy (USA and Canada only)
+
+No API key required. The displayed distance is not based on your coordinates but on the zip code.
+
+| **Option** | **Default** | **Description** |
+| --- | --- | --- |
+| `provider` | `"tankerkoenig"` | Make sure you set it to `"gasbuddy"`. |
+| `zip` | REQUIRED | The zip code of your address, e.g. `"12345"` |
+| `types` | `["regular"]` | Valid options are `regular`, `midgrade`, `premium`, `diesel`, `e85`, and `unl88`. |
+| `showDistance` | `false` | Not supported |
+| `radius` | `5` | Not supported |
+| `lat` | `undefined` | Not supported |
+| `lng` | `undefined` | Not supported |
+| `open` | `false` | Not supported |
+| `showOpenOnly` | `false` | Not supported |
+| `showBrand` | `false` | Not supported |
+
+### nsw (Australia NSW and TAS only)
 
 This provider gives no information if the gas stations are open or closed.
 Config options should be set accordingly `open`: false and `showOpenOnly`: false.

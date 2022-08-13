@@ -39,7 +39,8 @@
             {% endif %}
         </tr>
         {% for gasStation in gasStations %}
-            <tr>
+            {% set fadeStyle = loop.index0 | fade(loop.length) %}
+            <tr style="{{ fadeStyle }}">
                 <td>{{ gasStation.brand if config.showBrand else gasStation.name | shortenText | safe }}</td>
                 {% for type in config.types %}
                     {% if includes(priceList.types, type)  %}
@@ -56,9 +57,13 @@
                 {% endif %}
             </tr>
             {% if config.showAddress %}
-                <tr>
+                <tr style="{{ fadeStyle }}">
                     <td colspan="{{ 1 + config.types.length + (1 if config.showDistance else 0) + (1 if config.open else 0) }}" class="xsmall">
-                        {{ gasStation.address | shortenText | safe }}
+                        {% if not config.showAddressCity %}
+                            {{ gasStation.street | shortenText | safe }}
+                        {% else %}
+                            {{ gasStation.address | shortenText | safe }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endif %}
