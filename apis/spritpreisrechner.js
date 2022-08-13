@@ -110,7 +110,8 @@ function normalizeStations(stations, keys) {
             stations[index].prices[type] = -1;
         });
         stations[index].isOpen = value.open;
-        stations[index].address = `${value.location.postalCode} ${value.location.city} - ${value.location.address}`;
+        stations[index].street = value.location.address;
+        stations[index].address = `${value.location.postalCode} ${value.location.city} - ${stations[index].street}`;
         stations[index].lat = parseFloat(value.location.latitude);
         stations[index].lng = parseFloat(value.location.longitude);
         stations[index].distance = value.distance.toFixed(2);

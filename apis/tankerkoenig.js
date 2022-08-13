@@ -137,8 +137,9 @@ function normalizeStations(value, index, stations) {
         e10: value.e10
     };
     stations[index].distance = value.dist;
+    stations[index].street = `${value.street} ${value.houseNumber}`;
     stations[index].address = `${`0${value.postCode}`.slice(-5)} ${
-        value.place} - ${value.street} ${value.houseNumber}`;
+        value.place} - ${stations[index].street}`;
     /* eslint-enable no-param-reassign */
 }
 
