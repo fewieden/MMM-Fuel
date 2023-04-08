@@ -42,6 +42,7 @@ Module.register('MMM-Fuel', {
      * @member {Object} defaults - Defines the default config values.
      * @property {int} radius - Lookup area for gas stations.
      * @property {int} max - Amount of gas stations to display.
+     * @property {boolean} showMapIntegrated - Show Google Maps independant from voice commands
      * @property {boolean|string} map_api_key - API key for Google Maps.
      * @property {int} zoom - Zoom level of the map.
      * @property {int} width - Width of the map.
@@ -67,6 +68,7 @@ Module.register('MMM-Fuel', {
     defaults: {
         radius: 5,
         max: 5,
+        showMapIntegrated: false,
         map_api_key: false,
         zoom: 12,
         width: 600,
@@ -249,6 +251,11 @@ Module.register('MMM-Fuel', {
         if (notification === 'PRICELIST') {
             this.priceList = payload;
             this.updateDom(300);
+
+            if (this.config.showMapIntegrated) {
+                this.deinitMap();
+                this.initMap();
+            }
         }
     },
 
@@ -322,7 +329,25 @@ Module.register('MMM-Fuel', {
             return;
         }
 
-        const mapContainer = document.querySelector('div.MMM-Fuel-map');
+        let mapContainer = document.querySelector('div.MMM-Fuel-map');
+        let markercolor = "red";
+
+        if (this.config.showMapIntegrated) {
+            mapContainer = document.createElement('div');
+            mapContainer.setAttribute('id','MMM-Fuel-map');
+            mapContainer.style.position = "absolute";
+            mapContainer.style.marginTop = '40px';
+            mapContainer.style.left = "0";
+            mapContainer.style.width = this.config.width + "px";
+            mapContainer.style.height = this.config.height + "px";
+            mapContainer.style.zIndex = "1";
+            if (this.config.colored) {
+                mapContainer.style.filter = "grayscale(0)";
+            } else {
+                mapContainer.style.filter = "grayscale(1)";
+                markercolor = "white";
+            }
+        }
 
         if (!mapContainer) {
             return;
@@ -338,12 +363,29 @@ Module.register('MMM-Fuel', {
         const list = this.priceList.byPrice;
         this.markers = [];
 
-        for (let i = 0; i < list.length; i += 1) {
+        for (let i = 0; i < this.config.max; i += 1) {
             this.markers.push(new google.maps.Marker({
                 position: { lat: list[i].lat, lng: list[i].lng },
+                icon: {
+                    path: "M 0 -8 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039 z",
+                    fillColor: markercolor,
+                    fillOpacity: 0.6,
+                    strokeColor: '#000000',
+                    strokeWeight: 1,
+                    rotation: 0,
+                    scale: 2
+                },
                 label: i + 1 + '',
                 map: this.map
             }));
+        }
+
+        if (this.config.showMapIntegrated) {
+            var element = document.getElementById('MMM-Fuel-map');
+            if (typeof(element) != 'undefined' && element != null) {
+                element.remove();
+            }
+            document.querySelector('div.MMM-Fuel').appendChild(mapContainer);
         }
     },
 
