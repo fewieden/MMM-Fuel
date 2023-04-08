@@ -50,7 +50,7 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 | `open` | `false` | Display whether the gas station is open or not. |
 | `radius` | `5` | Lookup Area for Gas Stations in km. |
 | `max` | `5` | How many gas stations should be displayed. |
-| `showMapIntegrated` | `false` | Show Google Maps independant from voice commands. |
+| `showMapIntegrated` | `false` | Show Maps independant from voice/modal. |
 | `map_api_key` | `false` | Required to show the gas stations map with traffic layer. You can get it [here](https://console.developers.google.com/) and don't forget to activate maps api for javascript. |
 | `zoom` | `12` | Zoom of the map. (Min 0, Max 18 depends on the area) |
 | `height` | `600` | Height of the map in pixel. |
