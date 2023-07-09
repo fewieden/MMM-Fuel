@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+Thanks to [marcx28](https://github.com/marcx28) for their contributions.
+
 ### Fixed
 
 * [Sorting by price](https://github.com/fewieden/MMM-Fuel/issues/110)
@@ -11,6 +13,8 @@
 * Dependency: `lodash`
 
 ### Changed
+
+* [Allow custom header text](https://github.com/fewieden/MMM-Fuel/pull/102)
 
 ### Removed
 
