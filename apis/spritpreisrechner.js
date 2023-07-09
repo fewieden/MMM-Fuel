@@ -8,12 +8,18 @@
  */
 
 /**
+ * @external lodash
+ * @see https://www.npmjs.com/package/lodash
+ */
+const _ = require('lodash');
+
+/**
  * @external node-fetch
  * @see https://www.npmjs.com/package/node-fetch
  */
 const fetch = require('node-fetch');
 
-const { filterStations, sortByDistance } = require('./utils');
+const { filterStations } = require('./utils');
 
 const BASE_URL = 'https://api.e-control.at/sprit/1.0';
 const TYPES = {
@@ -176,15 +182,12 @@ async function getData() {
 
     stations = stations.filter(filterStations);
 
-    const distance = stations.slice(0);
-    distance.sort(sortByDistance);
-
     return {
         types: ['diesel', 'e5', 'gas'],
         unit: 'kilometer',
         currency: 'EUR',
         byPrice: stations,
-        byDistance: distance
+        byDistance: _.sortBy(stations, 'distance')
     };
 }
 

@@ -8,6 +8,12 @@
  */
 
 /**
+ * @external lodash
+ * @see https://www.npmjs.com/package/lodash
+ */
+const _ = require('lodash');
+
+/**
  * @external node-fetch
  * @see https://www.npmjs.com/package/node-fetch
  */
@@ -19,7 +25,7 @@ const fetch = require('node-fetch');
  */
 const { parse } = require('node-html-parser');
 
-const { fillMissingPrices, sortByDistance, sortByPrice, mergePrices } = require('./utils');
+const { fillMissingPrices, mergePrices, sortByPrice } = require('./utils');
 
 const BASE_URL = 'https://www.autoblog.com';
 const MAX_PAGE = 2;
@@ -156,15 +162,12 @@ async function getData() {
 
     const filteredStations = stations.filter(station => station.distance <= config.radius);
 
-    const stationsSortedByDistance = filteredStations.sort(sortByDistance);
-    const stationsSortedByPrice = [...stationsSortedByDistance].sort(sortByPrice.bind(null, config));
-
     return {
         types: ['regular', 'premium', 'mid-grade', 'diesel'],
         unit: 'mile',
         currency: 'USD',
-        byPrice: stationsSortedByPrice,
-        byDistance: stationsSortedByDistance
+        byPrice: _.sortBy(filteredStations, sortByPrice.bind(null, config)),
+        byDistance: _.sortBy(filteredStations, 'distance')
     };
 }
 

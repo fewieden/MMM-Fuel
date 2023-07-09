@@ -8,6 +8,12 @@
  */
 
 /**
+ * @external lodash
+ * @see https://www.npmjs.com/package/lodash
+ */
+const _ = require('lodash');
+
+/**
  * @function filterStations
  * @description Helper function to filter gas stations.
  *
@@ -16,22 +22,9 @@
  * @returns {boolean} To keep or filter the station.
  */
 function filterStations(station) {
-    const prices = Object.keys(station.prices);
+    const prices = _.keys(station.prices);
 
-    return !prices.every(type => station.prices[type] === -1);
-}
-
-/**
- * @function sortByDistance
- * @description Helper function to sort gas stations by distance.
- *
- * @param {Object} a - Gas Station
- * @param {Object} b - Gas Station
- *
- * @returns {number} Sorting weight.
- */
-function sortByDistance(a, b) {
-    return a.distance - b.distance;
+    return !_.every(prices, type => _.get(station, `prices.${type}`) === -1);
 }
 
 /**
@@ -45,8 +38,8 @@ function sortByDistance(a, b) {
  */
 function fillMissingPrices(config, station, maxPricesByType) {
     for (const type of config.types) {
-        if (!station.prices[type]) {
-            station.prices[type] = `>${maxPricesByType[type]}`;
+        if (!_.get(station, `prices.${type}`)) {
+            _.set(station, `prices.${type}`, `>${maxPricesByType[type]}`);
         }
     }
 }
@@ -60,15 +53,14 @@ function fillMissingPrices(config, station, maxPricesByType) {
  *
  * @returns {number} Sorting weight.
  */
-function sortByPrice(config, a, b) {
-    const aPrice = a.prices[config.sortBy];
-    const bPrice = b.prices[config.sortBy];
+function sortByPrice(config, station) {
+    const price = _.get(station, `prices.${config.sortBy}`);
 
-    if (!isNaN(aPrice) || !isNaN(bPrice)) {
-        return isNaN(aPrice) ? 1 : -1;
+    if (_.isNumber(price)) {
+        return price;
     }
 
-    return 0;
+    return Number.POSITIVE_INFINITY;
 }
 
 /**
@@ -108,6 +100,5 @@ module.exports = {
     fillMissingPrices,
     filterStations,
     mergePrices,
-    sortByDistance,
     sortByPrice
 };

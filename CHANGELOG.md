@@ -4,7 +4,11 @@
 
 ### Fixed
 
+* [Sorting by price](https://github.com/fewieden/MMM-Fuel/issues/110)
+
 ### Added
+
+* Dependency: `lodash`
 
 ### Changed
 

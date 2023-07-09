@@ -247,6 +247,7 @@ Module.register('MMM-Fuel', {
      */
     socketNotificationReceived(notification, payload) {
         if (notification === 'PRICELIST') {
+            Log.info(payload);
             this.priceList = payload;
             this.updateDom(300);
         }

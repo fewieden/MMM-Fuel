@@ -13,8 +13,9 @@ Gas Station Price Module for MagicMirror<sup>2</sup>
 * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
 * OPTIONAL: [Voice Control](https://github.com/fewieden/MMM-voice) and [MMM-Modal](https://github.com/fewieden/MMM-Modal)
 * npm
-* [node-fetch](https://www.npmjs.com/package/node-fetch)
+* [lodash](https://www.npmjs.com/package/lodash)
 * [moment](https://www.npmjs.com/package/moment)
+* [node-fetch](https://www.npmjs.com/package/node-fetch)
 * [node-html-parser](https://www.npmjs.com/package/node-html-parser)
 
 ## Installation

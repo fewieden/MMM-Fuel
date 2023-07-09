@@ -8,6 +8,12 @@
  */
 
 /**
+ * @external lodash
+ * @see https://www.npmjs.com/package/lodash
+ */
+const _ = require('lodash');
+
+/**
  * @external node-fetch
  * @see https://www.npmjs.com/package/node-fetch
  */
@@ -18,6 +24,8 @@ const fetch = require('node-fetch');
  * @see https://github.com/MichMich/MagicMirror/blob/master/js/logger.js
  */
 const Log = require('logger');
+
+const { filterStations, sortByPrice } = require('./utils');
 
 const BASE_URL = 'https://creativecommons.tankerkoenig.de/json';
 
@@ -57,44 +65,6 @@ function generateStationPricesUrl(ids) {
  */
 function generateStationInfoUrl(id) {
     return `${BASE_URL}/detail.php?id=${id}&apikey=${config.api_key}`;
-}
-
-/**
- * @function sortByPrice
- * @description Helper function to sort gas stations by price.
- *
- * @param {Object} a - Gas Station
- * @param {Object} b - Gas Station
- *
- * @returns {number} Sorting weight.
- */
-function sortByPrice(a, b) {
-    if (b[config.sortBy] === 0) {
-        return Number.MIN_SAFE_INTEGER;
-    } else if (a[config.sortBy] === 0) {
-        return Number.MAX_SAFE_INTEGER;
-    }
-
-    return a[config.sortBy] - b[config.sortBy];
-}
-
-/**
- * @function sortByDistance
- * @description Helper function to sort gas stations by distance.
- *
- * @param {Object} a - Gas Station
- * @param {Object} b - Gas Station
- *
- * @returns {number} Sorting weight.
- */
-function sortByDistance(a, b) {
-    if (b.dist === 0) {
-        return Number.MIN_SAFE_INTEGER;
-    } else if (a.dist === 0) {
-        return Number.MAX_SAFE_INTEGER;
-    }
-
-    return a.dist - b.dist;
 }
 
 /**
@@ -323,18 +293,12 @@ async function getData() {
     const stationsFiltered = stations.filter(filterStations);
     stationsFiltered.forEach(normalizeStations);
 
-    const distance = stationsFiltered.slice(0);
-    distance.sort(sortByDistance);
-
-    const price = stationsFiltered.slice(0);
-    price.sort(sortByPrice);
-
     return {
         types: ['diesel', 'e5', 'e10'],
         unit: 'kilometer',
         currency: 'EUR',
-        byPrice: price,
-        byDistance: distance
+        byPrice: _.sortBy(stationsFiltered, sortByPrice.bind(null, config)),
+        byDistance: _.sortBy(stationsFiltered, 'dist')
     };
 }
 
