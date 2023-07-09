@@ -1,9 +1,12 @@
-<header class="align-left">
-    {% if config.iconHeader %}
-        <i class="fa fa-car logo"></i>
-    {% endif %}
-    <span>{{ "FUEL_PRICES" | translate }}</span>
-</header>
+{% if not header %}
+    <header class="align-left">
+        {% if config.iconHeader %}
+            <i class="fa fa-car logo"></i>
+        {% endif %}
+            
+        <span>{{ "FUEL_PRICES" | translate }}</span>
+    </header>
+{% endif %}
 {% if not priceList %}
     <div class="dimmed light">{{ "LOADING" | translate | safe }}</div>
 {% else %}
