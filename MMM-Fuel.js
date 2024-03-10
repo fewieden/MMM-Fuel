@@ -161,7 +161,7 @@ Module.register('MMM-Fuel', {
 
         return {
             config: this.config,
-			header: this.data.header,
+            header: this.data.header,
             priceList: this.priceList,
             sortByPrice: this.sortByPrice,
             gasStations

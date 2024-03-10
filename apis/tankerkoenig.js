@@ -25,7 +25,7 @@ const fetch = require('node-fetch');
  */
 const Log = require('logger');
 
-const { filterStations, sortByPrice } = require('./utils');
+const { sortByPrice } = require('./utils');
 
 const BASE_URL = 'https://creativecommons.tankerkoenig.de/json';
 
