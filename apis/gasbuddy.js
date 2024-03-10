@@ -8,6 +8,12 @@
  */
 
 /**
+ * @external lodash
+ * @see https://www.npmjs.com/package/lodash
+ */
+const _ = require('lodash');
+
+/**
  * @external node-fetch
  * @see https://www.npmjs.com/package/node-fetch
  */
@@ -160,7 +166,7 @@ async function getData() {
     stations.forEach(station => fillMissingPrices(config, station, maxPricesByType));
 
     // Webpage doesn't support distance (only zip code).
-    const stationsSortedByPrice = stations.sort(sortByPrice.bind(null, config));
+    const stationsSortedByPrice = _.sortBy(stations, sortByPrice.bind(null, config));
     const stationsSortedByDistance = stationsSortedByPrice;
 
     return {

@@ -8,6 +8,12 @@
  */
 
 /**
+ * @external lodash
+ * @see https://www.npmjs.com/package/lodash
+ */
+const _ = require('lodash');
+
+/**
  * @external node-fetch
  * @see https://www.npmjs.com/package/node-fetch
  */
@@ -25,7 +31,7 @@ const moment = require('moment');
  */
 const Log = require('logger');
 
-const { filterStations, sortByDistance } = require('./utils');
+const { filterStations } = require('./utils');
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -126,15 +132,12 @@ async function getData() {
 
     stations = stations.filter(filterStations);
 
-    const distance = stations.slice(0);
-    distance.sort(sortByDistance);
-
     return {
         types: ['diesel', 'e5'],
         unit: 'kilometer',
         currency: 'AUD',
         byPrice: stations,
-        byDistance: distance
+        byDistance: _.sortBy(stations, 'distance')
     };
 }
 

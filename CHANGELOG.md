@@ -1,5 +1,21 @@
 # MMM-Fuel Changelog
 
+## [2.5.0]
+
+Thanks to [marcx28](https://github.com/marcx28) for their contributions.
+
+### Fixed
+
+* [Sorting by price](https://github.com/fewieden/MMM-Fuel/issues/110)
+
+### Added
+
+* Dependency: `lodash`
+
+### Changed
+
+* [Allow custom header text](https://github.com/fewieden/MMM-Fuel/pull/102)
+
 ## [2.4.0]
 
 ### Added
