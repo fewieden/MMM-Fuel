@@ -1,5 +1,15 @@
 # MMM-Fuel Changelog
 
+## [Unreleased]
+
+### Fixed
+
+### Added
+
+### Changed
+
+### Removed
+
 ## [2.5.0]
 
 Thanks to [marcx28](https://github.com/marcx28) for their contributions.
